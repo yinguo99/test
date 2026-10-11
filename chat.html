@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>聊天</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f7;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #333;
+    overflow: hidden;
+  }
+
+  /* --- 顶部导航栏 --- */
+  .chat-header {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: #fff;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+    z-index: 10;
+    flex-shrink: 0;
+  }
+  .back-btn {
+    font-size: 20px;
+    color: #007aff;
+    text-decoration: none;
+    margin-right: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .header-title { font-size: 17px; font-weight: 600; }
+
+  /* --- 聊天消息区域 --- */
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  /* 消息气泡通用样式 */
+  .message {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* 对方发来的消息（左边） */
+  .message.ai {
+    align-self: flex-start;
+    background: #fff;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  /* 我发出的消息（右边） */
+  .message.user {
+    align-self: flex-end;
+    background: #007aff;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,122,255,0.2);
+  }
+
+  /* --- 底部输入框 --- */
+  .chat-input-area {
+    display: flex;
+    padding: 12px 15px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom)); /* 适配iPhone底部横条 */
+    background: #fff;
+    box-shadow: 0 -1px 8px rgba(0,0,0,0.05);
+    flex-shrink: 0;
+  }
+  #message-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e5e5ea;
+    border-radius: 22px;
+    font-size: 15px;
+    outline: none;
+    background: #f2f2f7;
+    transition: all 0.2s ease;
+  }
+  #message-input:focus { border-color: #007aff; background: #fff; }
+  #send-btn {
+    margin-left: 10px;
+    padding: 0 20px;
+    background: #007aff;
+    color: #fff;
+    border: none;
+    border-radius: 22px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  #send-btn:active { transform: scale(0.95); opacity: 0.9; }
+</style>
+</head>
+<body>
+
+  <!-- 顶部导航 -->
+  <div class="chat-header">
+    <a href="index.html" class="back-btn">←</a>
+    <div class="header-title" id="character-name">夏萧因</div>
+  </div>
+
+  <!-- 聊天记录 -->
+  <div class="chat-messages" id="message-container">
+    <!-- 消息会由 JS 动态添加 -->
+  </div>
+
+  <!-- 输入框 -->
+  <div class="chat-input-area">
+    <input type="text" id="message-input" placeholder="输入消息..." autocomplete="off">
+    <button id="send-btn">发送</button>
+  </div>
+
+<script>
+  /* ================= 基础配置 ================= */
+  // 1. 你是想通过 URL 参数传名字吗？如果是，这就提取；如果不是，默认“夏萧因”
+  const urlParams = new URLSearchParams(window.location.search);
+  const characterName = urlParams.get('name') || '夏萧因';
+  document.getElementById('character-name').textContent = characterName;
+
+  // 2. 从本地存储里拿历史记录（如果之前聊过）
+  let chatHistory = JSON.parse(localStorage.getItem('chatHistory_' + characterName)) || [];
+  const messagesContainer = document.getElementById('message-container');
+  const inputField = document.getElementById('message-input');
+  const sendBtn = document.getElementById('send-btn');
+
+  /* ================= 渲染消息 ================= */
+  function renderMessages() {
+    messagesContainer.innerHTML = '';
+    chatHistory.forEach(msg => {
+      const div = document.createElement('div');
+      div.className = `message ${msg.role}`; // role 是 'user' 或 'ai'
+      div.textContent = msg.content;
+      messagesContainer.appendChild(div);
+    });
+    // 自动滚到底部
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  /* ================= 发送消息 ================= */
+  function sendMessage() {
+    const text = inputField.value.trim();
+    if (!text) return;
+
+    // 1. 添加用户消息
+    chatHistory.push({ role: 'user', content: text });
+    inputField.value = '';
+    renderMessages();
+
+    // 2. 模拟 AI 回复（假装在思考）
+    setTimeout(() => {
+      // 这里是本地模拟，后期替换为真实的 API 调用
+      let mockReply = `（这是${characterName}的本地测试回复）你说：“${text}”，我听到啦。`;
+      
+      // 触发一点简单的角色扮演判断
+      if (text.includes('熬夜') || text.includes('睡')) {
+        mockReply = `几点了还不睡？你要是再熬夜，我可要生气了。（无奈地叹气）`;
+      } else if (text.includes('喜欢') || text.includes('爱')) {
+        mockReply = `……笨蛋，突然说这个干什么，谁让你这么随便说出口的。`;
+      }
+
+      chatHistory.push({ role: 'ai', content: mockReply });
+      localStorage.setItem('chatHistory_' + characterName, JSON.stringify(chatHistory));
+      renderMessages();
+    }, 800); // 模拟 0.8 秒的思考延迟
+  }
+
+  /* ================= 事件绑定 ================= */
+  sendBtn.addEventListener('click', sendMessage);
+  inputField.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+
+  // 初始化渲染
+  renderMessages();
+
+  /* ================= 后续接 API 的口子 ================= */
+  /*
+  这里预留了调用真实 API 的位置。
+  你只需要把上面 setTimeout 里的模拟回复，替换成真正的 fetch 请求即可。
+  你需要准备：API_URL、API_KEY、模型名称（如 deepseek-v3）
+  比如：
+  fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer 你的API_KEY'
+      },
+      body: JSON.stringify({
+        model: 'deepseek-v3',
+        messages: [
+          { role: 'system', content: '你是夏萧因，性格傲娇、年上、像只小猫……（把人设贴在这里）' },
+          ...chatHistory
+        ]
+      })
+  }).then(res => res.json()).then(data => {
+      const aiReply = data.choices[0].message.content;
+      chatHistory.push({ role: 'ai', content: aiReply });
+      renderMessages();
+  });
+  */
+</script>
+</body>
+</html>
