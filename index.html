@@ -7,16 +7,9 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 50px 0 30px 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f2f2f7;
-    color: #333;
-    overflow: hidden;
+    height: 100vh; display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+    padding: 50px 0 30px 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f2f2f7; color: #333; overflow: hidden;
   }
 
   /* 顶部时间 */
@@ -26,160 +19,67 @@
 
   /* 卡片区域 */
   .home-grid {
-    flex: 1;
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-content: flex-start;
-    gap: 20px;
-    padding-top: 30px;
-    overflow-y: auto; /* 卡片多了可以滚动 */
+    flex: 1; width: 100%; display: flex; flex-wrap: wrap; justify-content: center;
+    align-content: flex-start; gap: 20px; padding-top: 30px; overflow-y: auto;
   }
 
-  /* 卡片 */
+  /* 卡片样式 */
   .avatar-card {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 75%;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
-    text-decoration: none;
-    color: inherit;
+    position: relative; display: flex; align-items: center; width: 75%; padding: 15px;
+    background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    cursor: pointer; transition: all 0.2s ease; user-select: none; text-decoration: none; color: inherit;
   }
   .avatar-card:active { transform: scale(0.96); }
   .avatar-img {
-    width: 50px; height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 15px;
-    border: 2px solid #fff;
-    background: #ccc;
+    width: 50px; height: 50px; border-radius: 50%; object-fit: cover;
+    margin-right: 15px; border: 2px solid #fff; background: #ccc;
   }
   .avatar-info h3 { margin: 0 0 4px 0; font-size: 16px; }
   .avatar-info p { margin: 0; font-size: 12px; color: #888; }
 
-  /* 卡片上的删除按钮（编辑模式下显示） */
+  /* 删除按钮（编辑模式显示） */
   .card-delete {
-    position: absolute;
-    top: -8px; right: -8px;
-    width: 24px; height: 24px;
-    background: #ff3b30;
-    color: #fff;
-    border-radius: 50%;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(255,59,48,0.4);
+    position: absolute; top: -8px; right: -8px; width: 24px; height: 24px;
+    background: #ff3b30; color: #fff; border-radius: 50%; display: none;
+    align-items: center; justify-content: center; font-size: 14px; font-weight: bold;
+    cursor: pointer; box-shadow: 0 2px 6px rgba(255,59,48,0.4); z-index: 10;
   }
   .home-grid.editing .card-delete { display: flex; }
 
   /* 底部工具栏 */
-  .bottom-dock {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-  }
+  .bottom-dock { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; }
   #entry {
-    display: block;
-    width: 75%;
-    text-align: center;
-    padding: 16px 0;
-    background: #007aff;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: 500;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-    transition: all 0.2s ease;
+    display: block; width: 75%; text-align: center; padding: 16px 0;
+    background: #007aff; color: #fff; text-decoration: none; border-radius: 25px;
+    font-size: 16px; font-weight: 500; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); transition: all 0.2s ease;
   }
   #entry:active { transform: scale(0.97); opacity: 0.9; }
-
-  /* 编辑开关按钮 */
   .edit-toggle {
-    font-size: 14px;
-    color: #007aff;
-    cursor: pointer;
-    padding: 5px 10px;
-    font-weight: 500;
+    font-size: 14px; color: #007aff; cursor: pointer; padding: 5px 10px; font-weight: 500;
   }
 
   /* 弹窗 Modal */
   .modal-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.4);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    backdrop-filter: blur(4px);
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4);
+    display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px);
   }
   .modal-overlay.active { display: flex; }
   .modal-box {
-    background: #fff;
-    width: 85%;
-    max-width: 350px;
-    border-radius: 24px;
-    padding: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    background: #fff; width: 85%; max-width: 350px; border-radius: 24px; padding: 25px;
+    display: flex; flex-direction: column; gap: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
   }
   .modal-box h2 { font-size: 18px; text-align: center; margin-bottom: 5px; }
   .modal-box input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    font-size: 14px;
-    outline: none;
+    width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 14px; outline: none;
   }
   .modal-box input:focus { border-color: #007aff; }
-  
-  /* 头像上传按钮样式 */
-  .file-upload-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .file-upload-wrapper label {
-    font-size: 12px;
-    color: #666;
-  }
-  .file-upload-wrapper input[type="file"] {
-    padding: 8px;
-    border: 1px dashed #ccc;
-    background: #fafafa;
-    border-radius: 10px;
-    font-size: 12px;
-  }
+  .file-upload-wrapper { display: flex; flex-direction: column; gap: 8px; }
+  .file-upload-wrapper label { font-size: 12px; color: #666; }
+  .file-upload-wrapper input[type="file"] { padding: 8px; border: 1px dashed #ccc; background: #fafafa; border-radius: 10px; font-size: 12px; }
 
   .modal-buttons { display: flex; gap: 10px; margin-top: 5px; }
-  .modal-buttons button {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-  }
+  .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 15px; font-weight: 500; cursor: pointer; }
   .btn-cancel { background: #f2f2f7; color: #666; }
   .btn-save { background: #007aff; color: #fff; }
 </style>
@@ -191,10 +91,7 @@
     <div id="time"></div>
   </div>
 
-  <!-- 卡片容器 -->
-  <div class="home-grid" id="card-container">
-    <!-- 卡片将由 JS 动态生成 -->
-  </div>
+  <div class="home-grid" id="card-container"></div>
 
   <div class="bottom-dock">
     <a id="entry" href="chat.html">进入聊天</a>
@@ -205,7 +102,7 @@
   <div class="modal-overlay" id="modal">
     <div class="modal-box">
       <h2 id="modalTitle">添加角色卡片</h2>
-      <input type="text" id="inputName" placeholder="角色名字（如：夏萧因）" maxlength="10">
+      <input type="text" id="inputName" placeholder="角色名字（如：默认角色）" maxlength="10">
       <input type="text" id="inputDesc" placeholder="卡片描述（如：点击进入聊天）" maxlength="15">
       <input type="text" id="inputLink" placeholder="点击后跳转的链接（如：chat.html）" value="chat.html">
       
@@ -233,15 +130,15 @@
   }
   tick(); setInterval(tick, 1000);
 
-  /* ================= 数据管理逻辑 ================= */
-  // 默认带一个初始卡片
+  /* ================= 数据管理 ================= */
+  // 默认的初始卡片（改成了通用名字）
   const DEFAULT_CARDS = [
-    { name: '夏萧因', desc: '点击进入聊天', link: 'chat.html', img: '' }
+    { name: '默认角色', desc: '点击进入聊天', link: 'chat.html', img: '' }
   ];
 
   let cards = JSON.parse(localStorage.getItem('myPhoneCards')) || DEFAULT_CARDS;
-  let editingIndex = -1; // -1 表示新增
-  let tempBase64 = '';   // 暂存上传的本地图片
+  let editingIndex = -1;
+  let tempBase64 = '';
 
   const container = document.getElementById('card-container');
   const modal = document.getElementById('modal');
@@ -252,13 +149,16 @@
   const inputFile = document.getElementById('inputFile');
   const inputUrl = document.getElementById('inputUrl');
 
-  // 渲染卡片
   function renderCards() {
     container.innerHTML = '';
     cards.forEach((card, index) => {
       const a = document.createElement('a');
       a.className = 'avatar-card';
-      a.href = card.link || '#';
+      
+      // 核心修改：自动把卡片名字作为参数传给聊天页
+      const finalLink = card.link || 'chat.html';
+      a.href = finalLink + (finalLink.includes('?') ? '&' : '?') + 'name=' + encodeURIComponent(card.name);
+      
       a.innerHTML = `
         <div class="card-delete" onclick="deleteCard(event, ${index})">×</div>
         <img src="${card.img || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCI+PHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuM2VtIiBmaWxsPSIjODg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0Ij5BdnRhcjwvdGV4dD48L3N2Zz4='}" class="avatar-img">
@@ -267,7 +167,6 @@
           <p>${card.desc}</p>
         </div>
       `;
-      // 点击卡片跳转（编辑模式下不跳转）
       a.addEventListener('click', (e) => {
         if (container.classList.contains('editing')) {
           e.preventDefault();
@@ -278,12 +177,8 @@
     });
   }
 
-  // 打开弹窗
   function openModal(index = -1) {
-    editingIndex = index;
-    tempBase64 = '';
-    inputFile.value = '';
-    
+    editingIndex = index; tempBase64 = ''; inputFile.value = '';
     if (index >= 0) {
       modalTitle.textContent = '编辑角色卡片';
       inputName.value = cards[index].name;
@@ -293,46 +188,27 @@
       if (cards[index].img.startsWith('data:')) tempBase64 = cards[index].img;
     } else {
       modalTitle.textContent = '添加角色卡片';
-      inputName.value = '';
-      inputDesc.value = '点击进入';
-      inputLink.value = 'chat.html';
-      inputUrl.value = '';
+      inputName.value = ''; inputDesc.value = '点击进入'; inputLink.value = 'chat.html'; inputUrl.value = '';
     }
     modal.classList.add('active');
   }
 
-  // 关闭弹窗
   function closeModal() {
-    modal.classList.remove('active');
-    inputFile.value = '';
-    tempBase64 = '';
+    modal.classList.remove('active'); inputFile.value = ''; tempBase64 = '';
   }
 
-  // 保存卡片
   function saveCard() {
     const name = inputName.value.trim();
     if (!name) return alert('请填写角色名字！');
-    
     const desc = inputDesc.value.trim() || '点击进入';
-    const link = inputLink.value.trim() || '#';
-    
-    // 图片优先级：本地文件 > 网络链接 > 空
+    const link = inputLink.value.trim() || 'chat.html';
     let img = tempBase64 || inputUrl.value.trim() || '';
-
     const newCard = { name, desc, link, img };
-
-    if (editingIndex >= 0) {
-      cards[editingIndex] = newCard;
-    } else {
-      cards.push(newCard);
-    }
-
+    if (editingIndex >= 0) { cards[editingIndex] = newCard; } else { cards.push(newCard); }
     localStorage.setItem('myPhoneCards', JSON.stringify(cards));
-    renderCards();
-    closeModal();
+    renderCards(); closeModal();
   }
 
-  // 删除卡片
   function deleteCard(e, index) {
     e.stopPropagation();
     if (confirm(`确定要删除【${cards[index].name}】吗？`)) {
@@ -342,35 +218,22 @@
     }
   }
 
-  // 读取本地文件转 Base64
   inputFile.addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+    const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = function(event) {
-      tempBase64 = event.target.result;
-    };
+    reader.onload = function(event) { tempBase64 = event.target.result; };
     reader.readAsDataURL(file);
   });
 
-  // 编辑模式开关
   document.getElementById('editBtn').addEventListener('click', function() {
     const isEditing = container.classList.toggle('editing');
     this.textContent = isEditing ? '✅ 完成编辑' : '✏️ 编辑桌面';
-    if (isEditing) {
-      // 在编辑模式下，长按或点击空白处也可以添加
-      // 简单起见，这里提示用户点击现有卡片修改，或者拖到底部点添加
-    }
   });
 
-  // 双击空白区域快速添加（可选功能）
   container.addEventListener('dblclick', function(e) {
-    if (e.target === container && container.classList.contains('editing')) {
-      openModal(-1);
-    }
+    if (e.target === container && container.classList.contains('editing')) { openModal(-1); }
   });
 
-  // 初始渲染
   renderCards();
 </script>
 </body>
