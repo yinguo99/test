@@ -12,25 +12,13 @@
     background: #f2f2f7; color: #333; overflow: hidden; position: relative;
   }
 
-  /* 顶部时间与设置 */
   .top-section { text-align: center; position: relative; width: 100%; }
   #time { font-size: 72px; font-weight: 300; margin: 0; line-height: 1; letter-spacing: 2px; }
   #date { font-size: 16px; color: #888; margin-top: 8px; }
-  
-  /* 全局设置按钮 */
-  .global-settings-btn {
-    position: absolute; right: 20px; top: 20px; font-size: 24px; cursor: pointer;
-    color: #888; padding: 10px; transition: transform 0.2s;
-  }
-  .global-settings-btn:active { transform: scale(0.9); }
+  .global-settings-btn { position: absolute; right: 20px; top: 20px; font-size: 24px; cursor: pointer; color: #888; padding: 10px; }
 
-  /* 卡片区域 */
-  .home-grid {
-    flex: 1; width: 100%; display: flex; flex-wrap: wrap; justify-content: center;
-    align-content: flex-start; gap: 20px; padding-top: 20px; overflow-y: auto;
-  }
+  .home-grid { flex: 1; width: 100%; display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: 20px; padding-top: 20px; overflow-y: auto; }
 
-  /* 卡片样式 */
   .avatar-card {
     position: relative; display: flex; align-items: center; width: 75%; padding: 15px;
     background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -38,14 +26,10 @@
     cursor: pointer; transition: all 0.2s ease; user-select: none; text-decoration: none; color: inherit;
   }
   .avatar-card:active { transform: scale(0.96); }
-  .avatar-img {
-    width: 50px; height: 50px; border-radius: 50%; object-fit: cover;
-    margin-right: 15px; border: 2px solid #fff; background: #ccc;
-  }
+  .avatar-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid #fff; background: #ccc; }
   .avatar-info h3 { margin: 0 0 4px 0; font-size: 16px; }
   .avatar-info p { margin: 0; font-size: 12px; color: #888; }
 
-  /* 删除按钮 */
   .card-delete {
     position: absolute; top: -8px; right: -8px; width: 24px; height: 24px;
     background: #ff3b30; color: #fff; border-radius: 50%; display: none;
@@ -54,7 +38,6 @@
   }
   .home-grid.editing .card-delete { display: flex; }
 
-  /* 底部工具栏 */
   .bottom-dock { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; }
   #entry {
     display: block; width: 75%; text-align: center; padding: 16px 0;
@@ -64,22 +47,11 @@
   #entry:active { transform: scale(0.97); opacity: 0.9; }
   .edit-toggle { font-size: 14px; color: #007aff; cursor: pointer; padding: 5px 10px; font-weight: 500; }
 
-  /* 弹窗 Modal（通用） */
-  .modal-overlay {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4);
-    display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px);
-  }
+  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); }
   .modal-overlay.active { display: flex; }
-  .modal-box {
-    background: #fff; width: 85%; max-width: 350px; border-radius: 24px; padding: 25px;
-    display: flex; flex-direction: column; gap: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    max-height: 80vh; overflow-y: auto;
-  }
+  .modal-box { background: #fff; width: 85%; max-width: 350px; border-radius: 24px; padding: 25px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); max-height: 85vh; overflow-y: auto; }
   .modal-box h2 { font-size: 18px; text-align: center; margin-bottom: 5px; }
-  .modal-box input, .modal-box select {
-    width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 14px; outline: none;
-  }
-  .modal-box input:focus, .modal-box select:focus { border-color: #007aff; }
+  .modal-box input, .modal-box select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 14px; outline: none; }
   .file-upload-wrapper { display: flex; flex-direction: column; gap: 8px; }
   .file-upload-wrapper label { font-size: 12px; color: #666; }
   .file-upload-wrapper input[type="file"] { padding: 8px; border: 1px dashed #ccc; background: #fafafa; border-radius: 10px; font-size: 12px; }
@@ -109,13 +81,14 @@
   <div class="modal-overlay" id="modal">
     <div class="modal-box">
       <h2 id="modalTitle">添加角色卡片</h2>
-      <input type="text" id="inputName" placeholder="角色名字（如：默认角色）" maxlength="10">
-      <input type="text" id="inputDesc" placeholder="卡片描述（如：点击进入聊天）" maxlength="15">
-      <input type="text" id="inputLink" placeholder="点击后跳转的链接" value="chat.html">
+      <p style="font-size:12px; color:#888; text-align:center; margin-bottom:-5px;">角色ID不可重复</p>
+      <input type="text" id="inputName" placeholder="角色ID（如：夏萧因）" maxlength="15">
+      <input type="text" id="inputDesc" placeholder="卡片描述（如：点击进入）" maxlength="15">
+      <input type="text" id="inputLink" placeholder="点击后跳转" value="chat.html">
       <div class="file-upload-wrapper">
-        <label>上传头像（本地图片，建议正方形）</label>
+        <label>上传角色头像 (会自动压缩)</label>
         <input type="file" id="inputFile" accept="image/*">
-        <input type="text" id="inputUrl" placeholder="或填入图片网络链接（可选）">
+        <input type="text" id="inputUrl" placeholder="或填入图片网络链接">
       </div>
       <div class="modal-buttons">
         <button class="btn-cancel" onclick="closeModal()">取消</button>
@@ -124,17 +97,27 @@
     </div>
   </div>
 
-  <!-- 全局 API 设置弹窗 -->
+  <!-- 全局设置弹窗 -->
   <div class="modal-overlay" id="global-modal">
     <div class="modal-box">
-      <h2>⚙️ 全局 API 设置</h2>
-      <p style="font-size:12px; color:#888; text-align:center; margin-bottom:10px;">这里的设置将应用于所有角色</p>
+      <h2>⚙️ 全局设置</h2>
+      
+      <p style="font-size:12px; color:#007aff; margin-bottom:-10px;">【我的信息】</p>
+      <input type="text" id="user-nickname" placeholder="我的昵称 (如：果果)">
+      <div class="file-upload-wrapper" style="margin-bottom:10px;">
+        <label>上传我的头像 (会自动压缩)</label>
+        <input type="file" id="user-avatar-file" accept="image/*">
+        <input type="text" id="user-avatar-url" placeholder="或填入我的头像网络链接">
+      </div>
+
+      <p style="font-size:12px; color:#007aff; margin-bottom:-10px;">【API 配置】</p>
       <select id="global-provider">
         <option value="deepseek">DeepSeek</option>
         <option value="zhipu">智谱 GLM</option>
       </select>
-      <input type="password" id="global-key" placeholder="输入你的 API Key (sk-...)">
-      <input type="text" id="global-model" placeholder="模型名称 (如 deepseek-chat 或 glm-4-flash)">
+      <input type="password" id="global-key" placeholder="输入 API Key (sk-...)">
+      <input type="text" id="global-model" placeholder="模型名称 (如 deepseek-chat)">
+
       <div class="modal-buttons">
         <button class="btn-cancel" onclick="closeGlobalSettings()">取消</button>
         <button class="btn-save" onclick="saveGlobalSettings()">保存</button>
@@ -143,7 +126,7 @@
   </div>
 
 <script>
-  /* ================= 时间逻辑 ================= */
+  /* 时间逻辑 */
   function pad(n) { return String(n).padStart(2, '0'); }
   var WEEK = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
   function tick() {
@@ -153,67 +136,62 @@
   }
   tick(); setInterval(tick, 1000);
 
-  /* ================= 全局 API 设置逻辑 ================= */
-  let globalApiConfig = JSON.parse(localStorage.getItem('globalApiConfig')) || {
-    provider: 'deepseek',
-    key: '',
-    model: 'deepseek-chat'
-  };
+  /* 全局配置逻辑 */
+  let globalConfig = JSON.parse(localStorage.getItem('globalApiConfig')) || { provider: 'deepseek', key: '', model: 'deepseek-chat' };
+  let globalUser = JSON.parse(localStorage.getItem('globalUserConfig')) || { nickname: '我', avatar: '' };
+  let tempUserBase64 = '';
 
   function openGlobalSettings() {
-    document.getElementById('global-provider').value = globalApiConfig.provider;
-    document.getElementById('global-key').value = globalApiConfig.key;
-    document.getElementById('global-model').value = globalApiConfig.model;
+    document.getElementById('user-nickname').value = globalUser.nickname || '';
+    document.getElementById('user-avatar-url').value = globalUser.avatar && !globalUser.avatar.startsWith('data:') ? globalUser.avatar : '';
+    if (globalUser.avatar && globalUser.avatar.startsWith('data:')) tempUserBase64 = globalUser.avatar;
+    document.getElementById('user-avatar-file').value = '';
+
+    document.getElementById('global-provider').value = globalConfig.provider;
+    document.getElementById('global-key').value = globalConfig.key;
+    document.getElementById('global-model').value = globalConfig.model;
     document.getElementById('global-modal').classList.add('active');
   }
 
-  function closeGlobalSettings() {
-    document.getElementById('global-modal').classList.remove('active');
-  }
-
-  // 供应商切换时，自动填入默认模型名
-  document.getElementById('global-provider').addEventListener('change', function(e) {
-    const modelInput = document.getElementById('global-model');
-    if (e.target.value === 'deepseek') modelInput.value = 'deepseek-chat';
-    if (e.target.value === 'zhipu') modelInput.value = 'glm-4-flash';
-  });
+  function closeGlobalSettings() { document.getElementById('global-modal').classList.remove('active'); }
 
   function saveGlobalSettings() {
-    globalApiConfig.provider = document.getElementById('global-provider').value;
-    globalApiConfig.key = document.getElementById('global-key').value.trim();
-    globalApiConfig.model = document.getElementById('global-model').value.trim();
-    localStorage.setItem('globalApiConfig', JSON.stringify(globalApiConfig));
-    closeGlobalSettings();
-    alert('全局设置已保存！');
+    globalUser.nickname = document.getElementById('user-nickname').value.trim();
+    const urlAvatar = document.getElementById('user-avatar-url').value.trim();
+    globalUser.avatar = tempUserBase64 || urlAvatar || globalUser.avatar;
+    localStorage.setItem('globalUserConfig', JSON.stringify(globalUser));
+
+    globalConfig.provider = document.getElementById('global-provider').value;
+    globalConfig.key = document.getElementById('global-key').value.trim();
+    globalConfig.model = document.getElementById('global-model').value.trim();
+    localStorage.setItem('globalApiConfig', JSON.stringify(globalConfig));
+
+    closeGlobalSettings(); alert('全局设置已保存！');
   }
 
-  /* ================= 卡片管理逻辑 ================= */
+  /* 卡片逻辑 */
   const DEFAULT_CARDS = [ { name: '默认角色', desc: '点击进入聊天', link: 'chat.html', img: '' } ];
   let cards = JSON.parse(localStorage.getItem('myPhoneCards')) || DEFAULT_CARDS;
   let editingIndex = -1; let tempBase64 = '';
 
-  const container = document.getElementById('card-container');
-  const modal = document.getElementById('modal');
-  const modalTitle = document.getElementById('modalTitle');
-  const inputName = document.getElementById('inputName');
-  const inputDesc = document.getElementById('inputDesc');
-  const inputLink = document.getElementById('inputLink');
-  const inputFile = document.getElementById('inputFile');
-  const inputUrl = document.getElementById('inputUrl');
-
   function renderCards() {
+    const container = document.getElementById('card-container');
     container.innerHTML = '';
     cards.forEach((card, index) => {
       const a = document.createElement('a');
       a.className = 'avatar-card';
       const finalLink = card.link || 'chat.html';
+      
+      let charConfig = JSON.parse(localStorage.getItem('charConfig_' + card.name)) || {};
+      let displayName = charConfig.nickname || card.name; 
+
       a.href = finalLink + (finalLink.includes('?') ? '&' : '?') + 'name=' + encodeURIComponent(card.name);
       
       a.innerHTML = `
         <div class="card-delete" onclick="deleteCard(event, ${index})">×</div>
         <img src="${card.img || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCI+PHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuM2VtIiBmaWxsPSIjODg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0Ij5BdnRhcjwvdGV4dD48L3N2Zz4='}" class="avatar-img">
         <div class="avatar-info">
-          <h3>${card.name}</h3>
+          <h3>${displayName}</h3>
           <p>${card.desc}</p>
         </div>
       `;
@@ -225,28 +203,31 @@
   }
 
   function openModal(index = -1) {
-    editingIndex = index; tempBase64 = ''; inputFile.value = '';
+    editingIndex = index; tempBase64 = ''; document.getElementById('inputFile').value = '';
     if (index >= 0) {
-      modalTitle.textContent = '编辑角色卡片';
-      inputName.value = cards[index].name;
-      inputDesc.value = cards[index].desc;
-      inputLink.value = cards[index].link;
-      inputUrl.value = cards[index].img.startsWith('data:') ? '' : cards[index].img;
+      document.getElementById('modalTitle').textContent = '编辑角色卡片';
+      const inputName = document.getElementById('inputName');
+      inputName.value = cards[index].name; inputName.disabled = true; inputName.style.background = '#eee';
+      document.getElementById('inputDesc').value = cards[index].desc;
+      document.getElementById('inputLink').value = cards[index].link;
+      document.getElementById('inputUrl').value = cards[index].img.startsWith('data:') ? '' : cards[index].img;
       if (cards[index].img.startsWith('data:')) tempBase64 = cards[index].img;
     } else {
-      modalTitle.textContent = '添加角色卡片';
-      inputName.value = ''; inputDesc.value = '点击进入'; inputLink.value = 'chat.html'; inputUrl.value = '';
+      document.getElementById('modalTitle').textContent = '添加角色卡片';
+      const inputName = document.getElementById('inputName');
+      inputName.value = ''; inputName.disabled = false; inputName.style.background = '#fff';
+      document.getElementById('inputDesc').value = '点击进入'; document.getElementById('inputLink').value = 'chat.html'; document.getElementById('inputUrl').value = '';
     }
-    modal.classList.add('active');
+    document.getElementById('modal').classList.add('active');
   }
 
-  function closeModal() { modal.classList.remove('active'); inputFile.value = ''; tempBase64 = ''; }
+  function closeModal() { document.getElementById('modal').classList.remove('active'); }
 
   function saveCard() {
-    const name = inputName.value.trim(); if (!name) return alert('请填写角色名字！');
-    const desc = inputDesc.value.trim() || '点击进入';
-    const link = inputLink.value.trim() || 'chat.html';
-    let img = tempBase64 || inputUrl.value.trim() || '';
+    const name = document.getElementById('inputName').value.trim(); if (!name) return alert('请填写角色ID！');
+    const desc = document.getElementById('inputDesc').value.trim() || '点击进入';
+    const link = document.getElementById('inputLink').value.trim() || 'chat.html';
+    let img = tempBase64 || document.getElementById('inputUrl').value.trim() || '';
     const newCard = { name, desc, link, img };
     if (editingIndex >= 0) { cards[editingIndex] = newCard; } else { cards.push(newCard); }
     localStorage.setItem('myPhoneCards', JSON.stringify(cards));
@@ -256,28 +237,57 @@
   function deleteCard(e, index) {
     e.stopPropagation();
     if (confirm(`确定要删除【${cards[index].name}】吗？`)) {
-      cards.splice(index, 1);
-      localStorage.setItem('myPhoneCards', JSON.stringify(cards));
-      renderCards();
+      cards.splice(index, 1); localStorage.setItem('myPhoneCards', JSON.stringify(cards)); renderCards();
     }
   }
 
-  inputFile.addEventListener('change', function(e) {
-    const file = e.target.files[0]; if (!file) return;
+  /* ======= 图片压缩核心逻辑 ======= */
+  function compressImage(file, maxWidth, maxHeight, callback) {
     const reader = new FileReader();
-    reader.onload = function(event) { tempBase64 = event.target.result; };
     reader.readAsDataURL(file);
+    reader.onload = function(e) {
+      const img = new Image();
+      img.src = e.target.result;
+      img.onload = function() {
+        let width = img.width; let height = img.height;
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) {
+            height = Math.round(height * maxWidth / width); width = maxWidth;
+          } else {
+            width = Math.round(width * maxHeight / height); height = maxHeight;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        callback(canvas.toDataURL('image/jpeg', 0.8));
+      };
+    };
+  }
+
+  // 角色头像上传
+  document.getElementById('inputFile').addEventListener('change', function(e) {
+    const file = e.target.files[0]; if (!file) return;
+    compressImage(file, 150, 150, function(compressedBase64) { tempBase64 = compressedBase64; });
+  });
+
+  // 用户全局头像上传
+  document.getElementById('user-avatar-file').addEventListener('change', function(e) {
+    const file = e.target.files[0]; if (!file) return;
+    compressImage(file, 150, 150, function(compressedBase64) { tempUserBase64 = compressedBase64; });
   });
 
   document.getElementById('editBtn').addEventListener('click', function() {
-    const isEditing = container.classList.toggle('editing');
+    const isEditing = document.getElementById('card-container').classList.toggle('editing');
     this.textContent = isEditing ? '✅ 完成编辑' : '✏️ 编辑桌面';
   });
 
-  container.addEventListener('dblclick', function(e) {
-    if (e.target === container && container.classList.contains('editing')) { openModal(-1); }
+  document.getElementById('card-container').addEventListener('dblclick', function(e) {
+    if (e.target === this && this.classList.contains('editing')) { openModal(-1); }
   });
 
+  window.addEventListener('pageshow', renderCards);
   renderCards();
 </script>
 </body>
