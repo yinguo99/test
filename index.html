@@ -9,18 +9,25 @@
   body {
     height: 100vh; display: flex; flex-direction: column; justify-content: space-between; align-items: center;
     padding: 50px 0 30px 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f2f2f7; color: #333; overflow: hidden;
+    background: #f2f2f7; color: #333; overflow: hidden; position: relative;
   }
 
-  /* 顶部时间 */
-  .top-section { text-align: center; }
+  /* 顶部时间与设置 */
+  .top-section { text-align: center; position: relative; width: 100%; }
   #time { font-size: 72px; font-weight: 300; margin: 0; line-height: 1; letter-spacing: 2px; }
   #date { font-size: 16px; color: #888; margin-top: 8px; }
+  
+  /* 全局设置按钮 */
+  .global-settings-btn {
+    position: absolute; right: 20px; top: 20px; font-size: 24px; cursor: pointer;
+    color: #888; padding: 10px; transition: transform 0.2s;
+  }
+  .global-settings-btn:active { transform: scale(0.9); }
 
   /* 卡片区域 */
   .home-grid {
     flex: 1; width: 100%; display: flex; flex-wrap: wrap; justify-content: center;
-    align-content: flex-start; gap: 20px; padding-top: 30px; overflow-y: auto;
+    align-content: flex-start; gap: 20px; padding-top: 20px; overflow-y: auto;
   }
 
   /* 卡片样式 */
@@ -38,7 +45,7 @@
   .avatar-info h3 { margin: 0 0 4px 0; font-size: 16px; }
   .avatar-info p { margin: 0; font-size: 12px; color: #888; }
 
-  /* 删除按钮（编辑模式显示） */
+  /* 删除按钮 */
   .card-delete {
     position: absolute; top: -8px; right: -8px; width: 24px; height: 24px;
     background: #ff3b30; color: #fff; border-radius: 50%; display: none;
@@ -55,11 +62,9 @@
     font-size: 16px; font-weight: 500; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); transition: all 0.2s ease;
   }
   #entry:active { transform: scale(0.97); opacity: 0.9; }
-  .edit-toggle {
-    font-size: 14px; color: #007aff; cursor: pointer; padding: 5px 10px; font-weight: 500;
-  }
+  .edit-toggle { font-size: 14px; color: #007aff; cursor: pointer; padding: 5px 10px; font-weight: 500; }
 
-  /* 弹窗 Modal */
+  /* 弹窗 Modal（通用） */
   .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4);
     display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px);
@@ -68,12 +73,13 @@
   .modal-box {
     background: #fff; width: 85%; max-width: 350px; border-radius: 24px; padding: 25px;
     display: flex; flex-direction: column; gap: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    max-height: 80vh; overflow-y: auto;
   }
   .modal-box h2 { font-size: 18px; text-align: center; margin-bottom: 5px; }
-  .modal-box input {
+  .modal-box input, .modal-box select {
     width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 14px; outline: none;
   }
-  .modal-box input:focus { border-color: #007aff; }
+  .modal-box input:focus, .modal-box select:focus { border-color: #007aff; }
   .file-upload-wrapper { display: flex; flex-direction: column; gap: 8px; }
   .file-upload-wrapper label { font-size: 12px; color: #666; }
   .file-upload-wrapper input[type="file"] { padding: 8px; border: 1px dashed #ccc; background: #fafafa; border-radius: 10px; font-size: 12px; }
@@ -89,6 +95,7 @@
   <div class="top-section">
     <div id="date"></div>
     <div id="time"></div>
+    <div class="global-settings-btn" onclick="openGlobalSettings()">⚙️</div>
   </div>
 
   <div class="home-grid" id="card-container"></div>
@@ -98,23 +105,39 @@
     <div class="edit-toggle" id="editBtn">✏️ 编辑桌面</div>
   </div>
 
-  <!-- 编辑/添加卡片的弹窗 -->
+  <!-- 卡片编辑弹窗 -->
   <div class="modal-overlay" id="modal">
     <div class="modal-box">
       <h2 id="modalTitle">添加角色卡片</h2>
       <input type="text" id="inputName" placeholder="角色名字（如：默认角色）" maxlength="10">
       <input type="text" id="inputDesc" placeholder="卡片描述（如：点击进入聊天）" maxlength="15">
-      <input type="text" id="inputLink" placeholder="点击后跳转的链接（如：chat.html）" value="chat.html">
-      
+      <input type="text" id="inputLink" placeholder="点击后跳转的链接" value="chat.html">
       <div class="file-upload-wrapper">
         <label>上传头像（本地图片，建议正方形）</label>
         <input type="file" id="inputFile" accept="image/*">
-        <input type="text" id="inputUrl" placeholder="或者填入图片网络链接（可选）">
+        <input type="text" id="inputUrl" placeholder="或填入图片网络链接（可选）">
       </div>
-
       <div class="modal-buttons">
         <button class="btn-cancel" onclick="closeModal()">取消</button>
         <button class="btn-save" onclick="saveCard()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 全局 API 设置弹窗 -->
+  <div class="modal-overlay" id="global-modal">
+    <div class="modal-box">
+      <h2>⚙️ 全局 API 设置</h2>
+      <p style="font-size:12px; color:#888; text-align:center; margin-bottom:10px;">这里的设置将应用于所有角色</p>
+      <select id="global-provider">
+        <option value="deepseek">DeepSeek</option>
+        <option value="zhipu">智谱 GLM</option>
+      </select>
+      <input type="password" id="global-key" placeholder="输入你的 API Key (sk-...)">
+      <input type="text" id="global-model" placeholder="模型名称 (如 deepseek-chat 或 glm-4-flash)">
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeGlobalSettings()">取消</button>
+        <button class="btn-save" onclick="saveGlobalSettings()">保存</button>
       </div>
     </div>
   </div>
@@ -130,15 +153,44 @@
   }
   tick(); setInterval(tick, 1000);
 
-  /* ================= 数据管理 ================= */
-  // 默认的初始卡片（改成了通用名字）
-  const DEFAULT_CARDS = [
-    { name: '默认角色', desc: '点击进入聊天', link: 'chat.html', img: '' }
-  ];
+  /* ================= 全局 API 设置逻辑 ================= */
+  let globalApiConfig = JSON.parse(localStorage.getItem('globalApiConfig')) || {
+    provider: 'deepseek',
+    key: '',
+    model: 'deepseek-chat'
+  };
 
+  function openGlobalSettings() {
+    document.getElementById('global-provider').value = globalApiConfig.provider;
+    document.getElementById('global-key').value = globalApiConfig.key;
+    document.getElementById('global-model').value = globalApiConfig.model;
+    document.getElementById('global-modal').classList.add('active');
+  }
+
+  function closeGlobalSettings() {
+    document.getElementById('global-modal').classList.remove('active');
+  }
+
+  // 供应商切换时，自动填入默认模型名
+  document.getElementById('global-provider').addEventListener('change', function(e) {
+    const modelInput = document.getElementById('global-model');
+    if (e.target.value === 'deepseek') modelInput.value = 'deepseek-chat';
+    if (e.target.value === 'zhipu') modelInput.value = 'glm-4-flash';
+  });
+
+  function saveGlobalSettings() {
+    globalApiConfig.provider = document.getElementById('global-provider').value;
+    globalApiConfig.key = document.getElementById('global-key').value.trim();
+    globalApiConfig.model = document.getElementById('global-model').value.trim();
+    localStorage.setItem('globalApiConfig', JSON.stringify(globalApiConfig));
+    closeGlobalSettings();
+    alert('全局设置已保存！');
+  }
+
+  /* ================= 卡片管理逻辑 ================= */
+  const DEFAULT_CARDS = [ { name: '默认角色', desc: '点击进入聊天', link: 'chat.html', img: '' } ];
   let cards = JSON.parse(localStorage.getItem('myPhoneCards')) || DEFAULT_CARDS;
-  let editingIndex = -1;
-  let tempBase64 = '';
+  let editingIndex = -1; let tempBase64 = '';
 
   const container = document.getElementById('card-container');
   const modal = document.getElementById('modal');
@@ -154,8 +206,6 @@
     cards.forEach((card, index) => {
       const a = document.createElement('a');
       a.className = 'avatar-card';
-      
-      // 核心修改：自动把卡片名字作为参数传给聊天页
       const finalLink = card.link || 'chat.html';
       a.href = finalLink + (finalLink.includes('?') ? '&' : '?') + 'name=' + encodeURIComponent(card.name);
       
@@ -168,10 +218,7 @@
         </div>
       `;
       a.addEventListener('click', (e) => {
-        if (container.classList.contains('editing')) {
-          e.preventDefault();
-          openModal(index);
-        }
+        if (container.classList.contains('editing')) { e.preventDefault(); openModal(index); }
       });
       container.appendChild(a);
     });
@@ -193,13 +240,10 @@
     modal.classList.add('active');
   }
 
-  function closeModal() {
-    modal.classList.remove('active'); inputFile.value = ''; tempBase64 = '';
-  }
+  function closeModal() { modal.classList.remove('active'); inputFile.value = ''; tempBase64 = ''; }
 
   function saveCard() {
-    const name = inputName.value.trim();
-    if (!name) return alert('请填写角色名字！');
+    const name = inputName.value.trim(); if (!name) return alert('请填写角色名字！');
     const desc = inputDesc.value.trim() || '点击进入';
     const link = inputLink.value.trim() || 'chat.html';
     let img = tempBase64 || inputUrl.value.trim() || '';
