@@ -22,10 +22,7 @@
   .settings-btn { font-size: 20px; cursor: pointer; color: #888; padding: 5px; }
 
   /* 聊天区域 */
-  .chat-messages {
-    flex: 1; overflow-y: auto; padding: 20px 15px;
-    display: flex; flex-direction: column; gap: 15px;
-  }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; }
   .message {
     max-width: 80%; padding: 12px 16px; border-radius: 18px;
     font-size: 15px; line-height: 1.5; word-wrap: break-word; animation: fadeIn 0.3s ease;
@@ -40,35 +37,24 @@
     display: flex; padding: 12px 15px; padding-bottom: calc(12px + env(safe-area-inset-bottom));
     background: #fff; box-shadow: 0 -1px 8px rgba(0,0,0,0.05);
   }
-  #message-input {
-    flex: 1; padding: 12px 16px; border: 1px solid #e5e5ea; border-radius: 22px;
-    font-size: 15px; outline: none; background: #f2f2f7;
-  }
-  #send-btn {
-    margin-left: 10px; padding: 0 20px; background: #007aff; color: #fff;
-    border: none; border-radius: 22px; font-size: 15px; font-weight: 500; cursor: pointer;
-  }
+  #message-input { flex: 1; padding: 12px 16px; border: 1px solid #e5e5ea; border-radius: 22px; font-size: 15px; outline: none; background: #f2f2f7; }
+  #send-btn { margin-left: 10px; padding: 0 20px; background: #007aff; color: #fff; border: none; border-radius: 22px; font-size: 15px; font-weight: 500; cursor: pointer; }
   #send-btn:disabled { background: #ccc; }
 
-  /* 设置弹窗 */
-  .modal {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5);
-    display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px);
-  }
+  /* 弹窗设置 */
+  .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); }
   .modal.active { display: flex; }
-  .modal-content {
-    background: #fff; padding: 20px; border-radius: 16px; width: 90%; max-width: 400px;
-    display: flex; flex-direction: column; gap: 12px;
-  }
-  .modal-content h3 { text-align: center; margin-bottom: 5px; }
-  .modal-content input, .modal-content textarea, .modal-content select {
-    width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit;
-  }
-  .modal-content textarea { height: 100px; resize: none; }
+  .modal-content { background: #fff; padding: 20px; border-radius: 16px; width: 90%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; max-height: 85vh; overflow-y: auto; }
+  .modal-content h3 { text-align: center; }
+  .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; }
+  .modal-content textarea { height: 120px; resize: none; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: #007aff; cursor: pointer; }
+  .checkbox-row input { width: 18px; height: 18px; }
   .modal-btns { display: flex; gap: 10px; margin-top: 10px; }
   .modal-btns button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; }
   .btn-cancel { background: #eee; color: #333; }
   .btn-save { background: #007aff; color: #fff; }
+  .hidden { display: none; }
 </style>
 </head>
 <body>
@@ -89,13 +75,27 @@
   <!-- 设置面板 -->
   <div class="modal" id="settings-modal">
     <div class="modal-content">
-      <h3>⚙️ API 设置</h3>
-      <select id="api-provider">
-        <option value="deepseek">DeepSeek</option>
-        <option value="zhipu">智谱 GLM</option>
-      </select>
-      <input type="password" id="api-key" placeholder="输入你的 API Key (sk-...)">
-      <textarea id="system-prompt" placeholder="输入角色的人设设定 (System Prompt)"></textarea>
+      <h3>⚙️ 角色设置</h3>
+      
+      <!-- 专属 API 开关 -->
+      <label class="checkbox-row">
+        <input type="checkbox" id="use-custom-api" onchange="toggleCustomApi()">
+        启用该角色专属 API
+      </label>
+
+      <!-- 专属 API 设置区域 -->
+      <div id="custom-api-area" class="hidden" style="display: flex; flex-direction: column; gap: 10px; padding: 10px; background: #f9f9f9; border-radius: 8px;">
+        <select id="api-provider">
+          <option value="deepseek">DeepSeek</option>
+          <option value="zhipu">智谱 GLM</option>
+        </select>
+        <input type="password" id="api-key" placeholder="专属 API Key">
+        <input type="text" id="api-model" placeholder="模型名称">
+      </div>
+
+      <p style="font-size:12px; color:#888; margin-top:5px;">角色人设 (System Prompt)</p>
+      <textarea id="system-prompt" placeholder="输入该角色的人设设定..."></textarea>
+      
       <div class="modal-btns">
         <button class="btn-cancel" onclick="closeSettings()">取消</button>
         <button class="btn-save" onclick="saveSettings()">保存</button>
@@ -104,49 +104,61 @@
   </div>
 
 <script>
-  /* ================= 初始化与配置 ================= */
-  // 自动获取 URL 里的名字，如果没有就是“默认角色”
+  /* ================= 初始化 ================= */
   const characterName = new URLSearchParams(window.location.search).get('name') || '默认角色';
   document.getElementById('character-name').textContent = characterName;
 
-  // 通用型默认人设
   const defaultPrompt = `你是一个人工智能伴侣，请根据用户的设定扮演相应的角色。你的回复应当自然、简短、有感情。`;
 
-  // 读取本地设置
-  let apiConfig = JSON.parse(localStorage.getItem('apiConfig')) || {
+  // 全局 API 配置
+  let globalApiConfig = JSON.parse(localStorage.getItem('globalApiConfig')) || { provider: 'deepseek', key: '', model: 'deepseek-chat' };
+
+  // 角色本地配置（人设 + 专属API）
+  let charConfig = JSON.parse(localStorage.getItem('charConfig_' + characterName)) || {
+    prompt: defaultPrompt,
+    useCustomApi: false,
     provider: 'deepseek',
     key: '',
-    systemPrompt: defaultPrompt
+    model: 'deepseek-chat'
   };
 
   let chatHistory = JSON.parse(localStorage.getItem('chatHistory_' + characterName)) || [];
-  const messagesContainer = document.getElementById('message-container');
-  const inputField = document.getElementById('message-input');
-  const sendBtn = document.getElementById('send-btn');
 
-  /* ================= 设置面板 ================= */
+  /* ================= 设置面板逻辑 ================= */
   function openSettings() {
-    document.getElementById('api-provider').value = apiConfig.provider;
-    document.getElementById('api-key').value = apiConfig.key;
-    document.getElementById('system-prompt').value = apiConfig.systemPrompt;
+    document.getElementById('system-prompt').value = charConfig.prompt;
+    document.getElementById('use-custom-api').checked = charConfig.useCustomApi;
+    
+    document.getElementById('api-provider').value = charConfig.provider;
+    document.getElementById('api-key').value = charConfig.key;
+    document.getElementById('api-model').value = charConfig.model;
+    
+    toggleCustomApi(); // 刷新显示状态
     document.getElementById('settings-modal').classList.add('active');
   }
 
-  function closeSettings() {
-    document.getElementById('settings-modal').classList.remove('active');
+  function closeSettings() { document.getElementById('settings-modal').classList.remove('active'); }
+
+  function toggleCustomApi() {
+    const isChecked = document.getElementById('use-custom-api').checked;
+    document.getElementById('custom-api-area').style.display = isChecked ? 'flex' : 'none';
   }
 
   function saveSettings() {
-    apiConfig.provider = document.getElementById('api-provider').value;
-    apiConfig.key = document.getElementById('api-key').value.trim();
-    apiConfig.systemPrompt = document.getElementById('system-prompt').value.trim();
-    localStorage.setItem('apiConfig', JSON.stringify(apiConfig));
+    charConfig.prompt = document.getElementById('system-prompt').value.trim();
+    charConfig.useCustomApi = document.getElementById('use-custom-api').checked;
+    charConfig.provider = document.getElementById('api-provider').value;
+    charConfig.key = document.getElementById('api-key').value.trim();
+    charConfig.model = document.getElementById('api-model').value.trim();
+    
+    localStorage.setItem('charConfig_' + characterName, JSON.stringify(charConfig));
     closeSettings();
-    alert('设置已保存！');
+    alert('角色设置已保存！');
   }
 
-  /* ================= 渲染消息 ================= */
+  /* ================= 渲染与请求 ================= */
   function renderMessages() {
+    const messagesContainer = document.getElementById('message-container');
     messagesContainer.innerHTML = '';
     chatHistory.forEach(msg => {
       if (msg.role === 'system') return;
@@ -158,14 +170,17 @@
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
-  /* ================= 发送消息与 API 调用 ================= */
   async function sendMessage() {
+    const inputField = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-btn');
     const text = inputField.value.trim();
     if (!text) return;
 
-    if (!apiConfig.key) {
-      alert('请先点击右上角 ⚙️ 设置你的 API Key！');
-      openSettings();
+    // 决定使用哪个 API 配置
+    const activeConfig = charConfig.useCustomApi ? charConfig : globalApiConfig;
+
+    if (!activeConfig.key) {
+      alert(charConfig.useCustomApi ? '请先在设置中填入专属 API Key！' : '请先回主页设置全局 API Key！');
       return;
     }
 
@@ -176,32 +191,23 @@
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'message ai loading';
     loadingDiv.textContent = '正在输入...';
-    messagesContainer.appendChild(loadingDiv);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    document.getElementById('message-container').appendChild(loadingDiv);
+    document.getElementById('message-container').scrollTop = document.getElementById('message-container').scrollHeight;
     sendBtn.disabled = true;
 
-    let url = '';
-    let headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiConfig.key}` };
-    let body = {};
-
-    if (apiConfig.provider === 'deepseek') {
-      url = 'https://api.deepseek.com/chat/completions';
-      body = {
-        model: 'deepseek-chat',
-        messages: [{ role: 'system', content: apiConfig.systemPrompt }, ...chatHistory]
-      };
-    } else if (apiConfig.provider === 'zhipu') {
-      url = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
-      body = {
-        model: 'glm-4-flash',
-        messages: [{ role: 'system', content: apiConfig.systemPrompt }, ...chatHistory]
-      };
-    }
+    let url = activeConfig.provider === 'deepseek' 
+      ? 'https://api.deepseek.com/chat/completions' 
+      : 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+    
+    const body = {
+      model: activeConfig.model || (activeConfig.provider === 'deepseek' ? 'deepseek-chat' : 'glm-4-flash'),
+      messages: [{ role: 'system', content: charConfig.prompt }, ...chatHistory]
+    };
 
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: headers,
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${activeConfig.key}` },
         body: JSON.stringify(body)
       });
 
@@ -216,7 +222,7 @@
       renderMessages();
 
     } catch (error) {
-      loadingDiv.textContent = '连接失败了，可能是跨域限制或 Key 错误。';
+      loadingDiv.textContent = '连接失败，可能是跨域或 Key 错误。';
       loadingDiv.style.color = 'red';
       console.error(error);
     } finally {
@@ -224,8 +230,8 @@
     }
   }
 
-  sendBtn.addEventListener('click', sendMessage);
-  inputField.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+  document.getElementById('send-btn').addEventListener('click', sendMessage);
+  document.getElementById('message-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
   renderMessages();
 </script>
