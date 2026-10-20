@@ -13,24 +13,28 @@
     color: #333; overflow: hidden;
   }
 
-  /* 顶部导航 */
   .header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 15px 20px; background: rgba(255, 255, 255, 0.7); 
-    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-    box-shadow: 0 1px 8px rgba(0,0,0,0.05); z-index: 10;
+    padding: 15px 20px; 
+    background: var(--panel-bg, rgba(255,255,255,0.7)); 
+    backdrop-filter: var(--material-blur, blur(15px)); -webkit-backdrop-filter: var(--material-blur, blur(15px));
+    border-bottom: var(--material-border, none);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.05); z-index: 10; transition: all 0.3s;
   }
-  .back-btn { font-size: 20px; color: #007aff; text-decoration: none; font-weight: 600; cursor: pointer; }
+  .back-btn { font-size: 20px; color: #007aff; text-decoration: none; font-weight: 600; cursor: pointer; width: 40px; }
   .header-title { font-size: 17px; font-weight: 600; }
-  .edit-btn { font-size: 15px; color: #007aff; cursor: pointer; font-weight: 500; }
+  .header-actions { display: flex; align-items: center; gap: 15px; width: 40px; justify-content: flex-end; }
+  .add-btn { font-size: 24px; color: #007aff; cursor: pointer; font-weight: 600; line-height: 1; }
+  .edit-btn { font-size: 15px; color: #007aff; cursor: pointer; font-weight: 500; white-space: nowrap; }
 
-  /* 卡片区域 */
   .home-grid { flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 20px; overflow-y: auto; }
 
   .avatar-card {
     position: relative; display: flex; align-items: center; width: 100%; padding: 15px;
-    background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border-radius: 16px; 
-    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    background: var(--panel-bg, rgba(255, 255, 255, 0.85)); 
+    backdrop-filter: var(--material-blur, blur(5px)); -webkit-backdrop-filter: var(--material-blur, blur(5px));
+    border: var(--material-border, none);
+    border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
     cursor: pointer; transition: all 0.2s ease; user-select: none; text-decoration: none; color: inherit;
   }
   .avatar-card:active { background: #f9f9f9; transform: scale(0.98); }
@@ -38,16 +42,14 @@
   .avatar-info h3 { margin: 0 0 4px 0; font-size: 16px; }
   .avatar-info p { margin: 0; font-size: 12px; color: #888; }
 
-  /* 删除按钮 */
   .card-delete {
     position: absolute; top: 10px; right: 10px; width: 24px; height: 24px;
     background: #ff3b30; color: #fff; border-radius: 50%; display: none;
     align-items: center; justify-content: center; font-size: 14px; font-weight: bold;
-    cursor: pointer; z-index: 10;
+    cursor: pointer; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
   .home-grid.editing .card-delete { display: flex; }
 
-  /* 弹窗 Modal */
   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); }
   .modal-overlay.active { display: flex; }
   .modal-box { background: #fff; width: 85%; max-width: 350px; border-radius: 24px; padding: 25px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); max-height: 85vh; overflow-y: auto; }
@@ -68,21 +70,23 @@
   <div class="header">
     <a href="index.html" class="back-btn">←</a>
     <div class="header-title">消息</div>
-    <div class="edit-btn" id="editBtn">编辑</div>
+    <div class="header-actions">
+      <div class="add-btn" onclick="openModal(-1)">+</div>
+      <div class="edit-btn" id="editBtn">编辑</div>
+    </div>
   </div>
 
   <div class="home-grid" id="card-container"></div>
 
-  <!-- 卡片编辑弹窗 -->
   <div class="modal-overlay" id="modal">
     <div class="modal-box">
       <h2 id="modalTitle">添加角色卡片</h2>
       <input type="text" id="inputName" placeholder="角色ID（不可重复）" maxlength="15">
-      <input type="text" id="inputDesc" placeholder="卡片描述（如：点击进入）" maxlength="15">
+      <input type="text" id="inputDesc" placeholder="卡片描述" maxlength="15">
       <div class="file-upload-wrapper">
-        <label>上传角色头像 (会自动压缩)</label>
+        <label>上传角色头像</label>
         <input type="file" id="inputFile" accept="image/*">
-        <input type="text" id="inputUrl" placeholder="或填入图片网络链接">
+        <input type="text" id="inputUrl" placeholder="或填入图片链接">
       </div>
       <div class="modal-buttons">
         <button class="btn-cancel" onclick="closeModal()">取消</button>
@@ -92,13 +96,22 @@
   </div>
 
 <script>
-  // 1. 动态应用壁纸和字体
-  const bg = localStorage.getItem('globalBgImage');
-  if(bg) document.body.style.background = `url(${bg}) center/cover no-repeat fixed`;
-  let theme = JSON.parse(localStorage.getItem('myThemeConfig')) || {};
-  if(theme.fontFamily) document.body.style.fontFamily = theme.fontFamily;
+  let themeConfig = JSON.parse(localStorage.getItem('myThemeConfig')) || {};
+  const root = document.documentElement;
+  if (themeConfig.material === 'frosted') {
+    root.style.setProperty('--panel-bg', 'rgba(255,255,255,0.6)');
+    root.style.setProperty('--material-blur', 'blur(15px)');
+    root.style.setProperty('--material-border', '1px solid rgba(255,255,255,0.3)');
+  } else if (themeConfig.material === 'glass') {
+    root.style.setProperty('--panel-bg', 'rgba(255,255,255,0.2)');
+    root.style.setProperty('--material-blur', 'blur(20px) saturate(180%)');
+    root.style.setProperty('--material-border', '1px solid rgba(255,255,255,0.6)');
+  }
 
-  // 2. 卡片逻辑
+  const bg = localStorage.getItem('bgImageMain');
+  if(bg) document.body.style.background = `url(${bg}) center/cover no-repeat fixed`;
+  if(themeConfig.fontFamily) document.body.style.fontFamily = themeConfig.fontFamily;
+
   let cards = JSON.parse(localStorage.getItem('myPhoneCards')) || [ { name: '默认角色', desc: '点击进入聊天', link: 'chat.html', img: '' } ];
   let editingIndex = -1; let tempBase64 = '';
 
@@ -108,24 +121,15 @@
     cards.forEach((card, index) => {
       const a = document.createElement('a');
       a.className = 'avatar-card';
-      const finalLink = card.link || 'chat.html';
-      
       let charConfig = JSON.parse(localStorage.getItem('charConfig_' + card.name)) || {};
       let displayName = charConfig.nickname || card.name; 
-
-      a.href = finalLink + (finalLink.includes('?') ? '&' : '?') + 'name=' + encodeURIComponent(card.name);
-      
+      a.href = (card.link || 'chat.html') + '?name=' + encodeURIComponent(card.name);
       a.innerHTML = `
         <div class="card-delete" onclick="deleteCard(event, ${index})">×</div>
         <img src="${card.img || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCI+PHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuM2VtIiBmaWxsPSIjODg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0Ij5BdnRhcjwvdGV4dD48L3N2Zz4='}" class="avatar-img">
-        <div class="avatar-info">
-          <h3>${displayName}</h3>
-          <p>${card.desc}</p>
-        </div>
+        <div class="avatar-info"><h3>${displayName}</h3><p>${card.desc}</p></div>
       `;
-      a.addEventListener('click', (e) => {
-        if (container.classList.contains('editing')) { e.preventDefault(); openModal(index); }
-      });
+      a.addEventListener('click', (e) => { if (container.classList.contains('editing')) { e.preventDefault(); openModal(index); } });
       container.appendChild(a);
     });
   }
@@ -155,7 +159,6 @@
     const desc = document.getElementById('inputDesc').value.trim() || '点击进入';
     const link = 'chat.html';
     let img = tempBase64 || document.getElementById('inputUrl').value.trim() || '';
-    
     if (editingIndex >= 0) {
       const oldName = cards[editingIndex].name;
       if (oldName !== name) {
@@ -165,7 +168,6 @@
         if (oldChatHistory) { localStorage.setItem('chatHistory_' + name, oldChatHistory); localStorage.removeItem('chatHistory_' + oldName); }
       }
     }
-
     const newCard = { name, desc, link, img };
     if (editingIndex >= 0) { cards[editingIndex] = newCard; } else { cards.push(newCard); }
     localStorage.setItem('myPhoneCards', JSON.stringify(cards));
@@ -174,19 +176,15 @@
 
   function deleteCard(e, index) {
     e.stopPropagation();
-    if (confirm(`确定要删除【${cards[index].name}】吗？`)) {
-      cards.splice(index, 1); localStorage.setItem('myPhoneCards', JSON.stringify(cards)); renderCards();
-    }
+    if (confirm(`确定要删除【${cards[index].name}】吗？`)) { cards.splice(index, 1); localStorage.setItem('myPhoneCards', JSON.stringify(cards)); renderCards(); }
   }
 
   function compressImage(file, maxWidth, maxHeight, callback) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
+    const reader = new FileReader(); reader.readAsDataURL(file);
     reader.onload = function(e) {
-      const img = new Image();
-      img.src = e.target.result;
+      const img = new Image(); img.src = e.target.result;
       img.onload = function() {
-        let width = img.width; let height = img.height;
+        let width = img.width, height = img.height;
         if (width > maxWidth || height > maxHeight) {
           if (width / height > maxWidth / maxHeight) { height = Math.round(height * maxWidth / width); width = maxWidth; } 
           else { width = Math.round(width * maxHeight / height); height = maxHeight; }
@@ -206,10 +204,6 @@
   document.getElementById('editBtn').addEventListener('click', function() {
     const isEditing = document.getElementById('card-container').classList.toggle('editing');
     this.textContent = isEditing ? '完成' : '编辑';
-  });
-
-  document.getElementById('card-container').addEventListener('dblclick', function(e) {
-    if (e.target === this && this.classList.contains('editing')) { openModal(-1); }
   });
 
   window.addEventListener('pageshow', renderCards);
