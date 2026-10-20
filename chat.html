@@ -6,38 +6,53 @@
 <title>聊天中</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { height: 100vh; display: flex; flex-direction: column; background: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #333; overflow: hidden; }
+  body { height: 100vh; display: flex; flex-direction: column; background: #f5f5f7; font-family: var(--theme-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif); color: #333; overflow: hidden; }
   
-  /* 顶部导航 */
-  .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: #fff; box-shadow: 0 1px 8px rgba(0,0,0,0.05); z-index: 10; }
+  /* 顶部导航 (毛玻璃) */
+  .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 1px 8px rgba(0,0,0,0.05); z-index: 10; }
   .back-btn { font-size: 20px; color: #007aff; text-decoration: none; font-weight: 600; cursor: pointer; }
   .header-title { font-size: 17px; font-weight: 600; }
   .settings-btn { font-size: 20px; cursor: pointer; color: #888; padding: 5px; }
 
-  /* 聊天区域 */
-  .chat-messages { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; }
+  /* 聊天区域 (毛玻璃 + 透底) */
+  .chat-messages { 
+    flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; 
+    background: rgba(245, 245, 247, 0.3); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+  }
   
   /* 消息行容器 (包含头像和气泡) */
   .message-row { display: flex; align-items: flex-start; width: 100%; gap: 10px; animation: fadeIn 0.3s ease; }
-  .message-row.user { flex-direction: row-reverse; } /* 用户消息靠右 */
-  
+  .message-row.user { flex-direction: row-reverse; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
   /* 头像 */
-  .msg-avatar { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; background: #ddd; flex-shrink: 0; border: 1px solid #eee; }
+  .msg-avatar { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: #ddd; flex-shrink: 0; border: 1px solid #eee; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
   
-  /* 气泡 */
-  .message { max-width: 70%; padding: 12px 16px; border-radius: 8px; font-size: 15px; line-height: 1.5; word-wrap: break-word; position: relative; }
-  .message.ai { background: #fff; border-top-left-radius: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-  .message.user { background: #007aff; color: #fff; border-top-right-radius: 0; box-shadow: 0 1px 4px rgba(0,122,255,0.2); }
+  /* 气泡 (应用主题工坊的动态变量) */
+  .message { 
+    max-width: 70%; padding: 12px 16px; 
+    border-radius: var(--bubble-radius, 18px); 
+    font-size: 15px; line-height: 1.5; word-wrap: break-word; position: relative; 
+    font-family: var(--theme-font, inherit); 
+  }
+  .message.ai { 
+    background: var(--bubble-ai-bg, #ffffff); 
+    color: var(--bubble-ai-text, #333);
+    border-top-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); 
+  }
+  .message.user { 
+    background: var(--bubble-user-bg, #007aff); 
+    color: var(--bubble-user-text, #ffffff); 
+    border-top-right-radius: 4px; box-shadow: 0 1px 4px rgba(0,122,255,0.2); 
+  }
   
   /* 气泡小尖角 */
-  .message.ai::before { content: ''; position: absolute; top: 0; left: -8px; border: 8px solid transparent; border-top-color: #fff; border-right-color: #fff; }
-  .message.user::before { content: ''; position: absolute; top: 0; right: -8px; border: 8px solid transparent; border-top-color: #007aff; border-left-color: #007aff; }
+  .message.ai::before { content: ''; position: absolute; top: 0; left: -8px; border: 8px solid transparent; border-top-color: var(--bubble-ai-bg, #fff); border-right-color: var(--bubble-ai-bg, #fff); }
+  .message.user::before { content: ''; position: absolute; top: 0; right: -8px; border: 8px solid transparent; border-top-color: var(--bubble-user-bg, #007aff); border-left-color: var(--bubble-user-bg, #007aff); }
 
-  /* 底部输入 */
-  .chat-input-area { display: flex; padding: 12px 15px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); background: #fff; box-shadow: 0 -1px 8px rgba(0,0,0,0.05); }
-  #message-input { flex: 1; padding: 12px 16px; border: 1px solid #e5e5ea; border-radius: 22px; font-size: 15px; outline: none; background: #f2f2f7; }
+  /* 底部输入 (毛玻璃) */
+  .chat-input-area { display: flex; padding: 12px 15px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px); box-shadow: 0 -1px 8px rgba(0,0,0,0.05); }
+  #message-input { flex: 1; padding: 12px 16px; border: 1px solid #e5e5ea; border-radius: 22px; font-size: 15px; outline: none; background: rgba(242, 242, 247, 0.8); }
   #send-btn { margin-left: 10px; padding: 0 20px; background: #007aff; color: #fff; border: none; border-radius: 22px; font-size: 15px; font-weight: 500; cursor: pointer; }
   #send-btn:disabled { background: #ccc; }
 
@@ -50,12 +65,10 @@
   .form-group label { font-size: 13px; color: #666; font-weight: 500; }
   .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; }
   .form-group textarea { resize: vertical; min-height: 60px; }
-  .form-group textarea.tall { min-height: 100px; }
   
   .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: #333; cursor: pointer; padding: 10px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin: 5px 0; }
   .checkbox-row input { width: 18px; height: 18px; }
   .custom-api-area { display: flex; flex-direction: column; gap: 10px; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
-  
   .modal-btns { display: flex; gap: 10px; margin-top: 10px; }
   .modal-btns button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: 500; }
   .btn-cancel { background: #eee; color: #333; }
@@ -79,6 +92,7 @@
     <button id="send-btn">发送</button>
   </div>
 
+  <!-- 设置面板 -->
   <div class="modal" id="settings-modal">
     <div class="modal-content">
       <h3>📇 角色卡设置</h3>
@@ -89,7 +103,7 @@
       </div>
       <div class="form-group">
         <label>显示昵称 (备注，优先展示)</label>
-        <input type="text" id="card-nickname" placeholder="如：夏小猫 (不填则显示底层ID)">
+        <input type="text" id="card-nickname" placeholder="如：夏小猫">
       </div>
       
       <div class="form-group"><label>性别 / 年龄</label><input type="text" id="card-gender" placeholder="选填"></div>
@@ -120,22 +134,46 @@
   </div>
 
 <script>
+  // 1. 读取基本参数与全局配置
   const characterName = new URLSearchParams(window.location.search).get('name') || '默认角色';
   document.getElementById('card-name').value = characterName;
 
   let globalApiConfig = JSON.parse(localStorage.getItem('globalApiConfig')) || { provider: 'deepseek', key: '', model: 'deepseek-chat' };
-  
-  // 读取用户全局设置 (头像和昵称)
   let globalUser = JSON.parse(localStorage.getItem('globalUserConfig')) || { nickname: '我', avatar: '' };
-  // 默认用户头像SVG
+  
   const defaultUserAvatar = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMDA3YWZmIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuM2VtIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0Ij5NZTwvdGV4dD48L3N2Zz4=';
-  // 默认角色头像SVG
   const defaultAiAvatar = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuM2VtIiBmaWxsPSIjODg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIj5BSTwvdGV4dD48L3N2Zz4=';
 
   const defaultCardData = { nickname: '', gender: '', appearance: '', personality: '', background: '', speakingStyle: '', firstMessage: '', systemPrompt: '', useCustomApi: false, provider: 'deepseek', key: '', model: 'deepseek-chat' };
   let charConfig = JSON.parse(localStorage.getItem('charConfig_' + characterName)) || { ...defaultCardData };
   let chatHistory = JSON.parse(localStorage.getItem('chatHistory_' + characterName)) || [];
 
+  // 2. 动态应用主题和壁纸
+  let themeConfig = JSON.parse(localStorage.getItem('myThemeConfig')) || {};
+  const root = document.documentElement;
+  if (themeConfig.userBubbleColor) {
+    root.style.setProperty('--bubble-user-bg', themeConfig.userBubbleColor);
+    root.style.setProperty('--bubble-user-text', getContrastColor(themeConfig.userBubbleColor));
+    root.style.setProperty('--bubble-ai-bg', themeConfig.aiBubbleColor);
+    root.style.setProperty('--bubble-ai-text', getContrastColor(themeConfig.aiBubbleColor));
+    root.style.setProperty('--bubble-radius', themeConfig.bubbleRadius + 'px');
+    root.style.setProperty('--theme-font', themeConfig.fontFamily);
+  }
+  
+  const bg = localStorage.getItem('globalBgImage');
+  if(bg) document.body.style.background = `url(${bg}) center/cover no-repeat fixed`;
+
+  function getContrastColor(hexcolor) {
+    if(!hexcolor) return '#333';
+    hexcolor = hexcolor.replace("#", "");
+    var r = parseInt(hexcolor.substr(0, 2), 16);
+    var g = parseInt(hexcolor.substr(2, 2), 16);
+    var b = parseInt(hexcolor.substr(4, 2), 16);
+    var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? '#333333' : '#ffffff';
+  }
+
+  // 3. 初始化与 UI 交互
   updateHeaderTitle();
   function updateHeaderTitle() {
     document.getElementById('character-name').textContent = charConfig.nickname || characterName;
@@ -205,16 +243,14 @@
     }
   }
 
-  // 🌟 核心改动：渲染带头像的微信风格气泡
+  // 4. 渲染消息 (带头像)
   function renderMessages() {
     const messagesContainer = document.getElementById('message-container');
     messagesContainer.innerHTML = '';
     
-    // 渲染开场白
     if (chatHistory.length === 0 && charConfig.firstMessage) {
       addMessageRow('ai', charConfig.firstMessage);
     }
-    // 渲染历史记录
     chatHistory.forEach(msg => {
       addMessageRow(msg.role === 'assistant' ? 'ai' : 'user', msg.content);
     });
@@ -226,7 +262,6 @@
     const row = document.createElement('div');
     row.className = `message-row ${role}`;
 
-    // 判断用哪个头像
     let avatarSrc = role === 'ai' ? defaultAiAvatar : (globalUser.avatar || defaultUserAvatar);
 
     row.innerHTML = `
@@ -236,6 +271,7 @@
     container.appendChild(row);
   }
 
+  // 5. 发送消息与打字机效果
   async function sendMessage() {
     const inputField = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-btn');
@@ -243,13 +279,12 @@
     if (!text) return;
 
     const activeConfig = charConfig.useCustomApi ? charConfig : globalApiConfig;
-    if (!activeConfig.key) { alert('请先设置 API Key！'); return; }
+    if (!activeConfig.key) { alert('请先在主页设置 API Key！'); return; }
 
     chatHistory.push({ role: 'user', content: text });
     inputField.value = '';
     renderMessages();
 
-    // 加载气泡
     const container = document.getElementById('message-container');
     const loadingRow = document.createElement('div');
     loadingRow.className = 'message-row ai';
@@ -280,11 +315,37 @@
       const data = await response.json();
       
       loadingRow.remove();
-      chatHistory.push({ role: 'assistant', content: data.choices[0].message.content });
+      const aiText = data.choices[0].message.content;
+      
+      // 保存历史记录
+      chatHistory.push({ role: 'assistant', content: aiText });
       localStorage.setItem('chatHistory_' + characterName, JSON.stringify(chatHistory));
-      renderMessages();
+      
+      // —— 打字机效果开始 ——
+      const prevHistory = chatHistory.slice(0, -1);
+      container.innerHTML = '';
+      prevHistory.forEach(msg => { addMessageRow(msg.role === 'assistant' ? 'ai' : 'user', msg.content); });
+
+      const typewriterRow = document.createElement('div');
+      typewriterRow.className = `message-row ai`;
+      typewriterRow.innerHTML = `<img src="${defaultAiAvatar}" class="msg-avatar"><div class="message ai" id="typewriter-text"></div>`;
+      container.appendChild(typewriterRow);
+      
+      const textContainer = document.getElementById('typewriter-text');
+      let i = 0;
+      const timer = setInterval(() => {
+        if (i < aiText.length) {
+          textContainer.textContent += aiText.charAt(i);
+          i++;
+          container.scrollTop = container.scrollHeight;
+        } else {
+          clearInterval(timer);
+        }
+      }, 50); // 这里调整速度：50ms/字
+      // —— 打字机效果结束 ——
+
     } catch (error) {
-      loadingRow.innerHTML = `<img src="${defaultAiAvatar}" class="msg-avatar"><div class="message ai" style="color:red; font-style:italic;">连接失败，请检查跨域或 Key。</div>`;
+      loadingRow.innerHTML = `<img src="${defaultAiAvatar}" class="msg-avatar"><div class="message ai" style="color:red;">连接失败，请检查跨域或 Key。</div>`;
     } finally {
       sendBtn.disabled = false;
     }
