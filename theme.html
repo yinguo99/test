@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>主题工坊</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { height: 100vh; display: flex; flex-direction: column; background: #f2f2f7; font-family: -apple-system, sans-serif; color: #333; overflow: hidden; }
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: #fff; box-shadow: 0 1px 8px rgba(0,0,0,0.05); z-index: 10; }
+  .back-btn { font-size: 20px; color: #007aff; text-decoration: none; font-weight: 600; cursor: pointer; }
+  .header-title { font-size: 17px; font-weight: 600; }
+  .save-btn { font-size: 15px; color: #007aff; cursor: pointer; font-weight: 600; }
+
+  .content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+  
+  /* 预览区 */
+  .preview-area { background: #e5e5ea; padding: 15px; border-radius: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .preview-msg { max-width: 80%; padding: 10px 15px; font-size: 14px; }
+  .preview-msg.ai { background: var(--bubble-ai-bg, #fff); color: var(--bubble-ai-text, #333); border-radius: var(--bubble-radius, 18px); border-top-left-radius: 4px; align-self: flex-start; }
+  .preview-msg.user { background: var(--bubble-user-bg, #007aff); color: var(--bubble-user-text, #fff); border-radius: var(--bubble-radius, 18px); border-top-right-radius: 4px; align-self: flex-end; }
+
+  /* 控制区 */
+  .control-group { background: #fff; padding: 15px; border-radius: 16px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+  .control-item { display: flex; justify-content: space-between; align-items: center; }
+  .control-item label { font-size: 15px; font-weight: 500; }
+  .control-item input[type="color"] { width: 40px; height: 40px; border: none; border-radius: 8px; cursor: pointer; background: none; padding: 0; }
+  .control-item input[type="range"] { width: 150px; }
+  .control-item select { padding: 8px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <a href="index.html" class="back-btn">←</a>
+    <div class="header-title">🎨 主题工坊</div>
+    <div class="save-btn" onclick="saveTheme()">保存</div>
+  </div>
+
+  <div class="content">
+    <!-- 实时预览 -->
+    <div class="preview-area" id="preview-area">
+      <p style="text-align:center; font-size:12px; color:#888; margin-bottom:10px;">实时预览</p>
+      <div class="preview-msg ai" id="preview-ai">今天天气不错，要一起出去走走吗？</div>
+      <div class="preview-msg user" id="preview-user">好呀，等我换件衣服！</div>
+    </div>
+
+    <!-- 气泡设置 -->
+    <div class="control-group">
+      <h3 style="font-size: 14px; color: #666;">【气泡设置】</h3>
+      <div class="control-item">
+        <label>我的气泡颜色</label>
+        <input type="color" id="user-bubble-color" oninput="applyPreview()">
+      </div>
+      <div class="control-item">
+        <label>TA的气泡颜色</label>
+        <input type="color" id="ai-bubble-color" oninput="applyPreview()">
+      </div>
+      <div class="control-item">
+        <label>气泡圆角大小</label>
+        <input type="range" id="bubble-radius" min="0" max="30" value="18" oninput="applyPreview()">
+        <span id="radius-val" style="font-size:12px; color:#888;">18px</span>
+      </div>
+    </div>
+
+    <!-- 字体与排版 -->
+    <div class="control-group">
+      <h3 style="font-size: 14px; color: #666;">【字体设置】</h3>
+      <div class="control-item">
+        <label>聊天字体</label>
+        <select id="font-family" onchange="applyPreview()">
+          <option value="-apple-system, sans-serif">系统默认</option>
+          <option value="'KaiTi', '楷体', serif">温婉楷体</option>
+          <option value="'STSong', '宋体', serif">复古宋体</option>
+          <option value="'Courier New', monospace">极客等宽</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // 读取现有主题配置
+  let theme = JSON.parse(localStorage.getItem('myThemeConfig')) || {
+    userBubbleColor: '#007aff',
+    aiBubbleColor: '#ffffff',
+    bubbleRadius: '18',
+    fontFamily: '-apple-system, sans-serif'
+  };
+
+  // 初始化控件
+  document.getElementById('user-bubble-color').value = theme.userBubbleColor;
+  document.getElementById('ai-bubble-color').value = theme.aiBubbleColor;
+  document.getElementById('bubble-radius').value = theme.bubbleRadius;
+  document.getElementById('radius-val').textContent = theme.bubbleRadius + 'px';
+  document.getElementById('font-family').value = theme.fontFamily;
+
+  // 实时预览函数 (通过改变 CSS 变量)
+  function applyPreview() {
+    const uColor = document.getElementById('user-bubble-color').value;
+    const aColor = document.getElementById('ai-bubble-color').value;
+    const radius = document.getElementById('bubble-radius').value;
+    const font = document.getElementById('font-family').value;
+
+    document.getElementById('radius-val').textContent = radius + 'px';
+
+    // 应用到根元素
+    const root = document.documentElement;
+    root.style.setProperty('--bubble-user-bg', uColor);
+    root.style.setProperty('--bubble-ai-bg', aColor);
+    root.style.setProperty('--bubble-radius', radius + 'px');
+    root.style.setProperty('--theme-font', font);
+
+    // 智能处理文字颜色：如果气泡太亮，字就变黑；太暗，字就变白
+    root.style.setProperty('--bubble-user-text', getContrastColor(uColor));
+    root.style.setProperty('--bubble-ai-text', getContrastColor(aColor));
+  }
+
+  // 获取对比色 (十六进制变黑白)
+  function getContrastColor(hexcolor) {
+    hexcolor = hexcolor.replace("#", "");
+    var r = parseInt(hexcolor.substr(0, 2), 16);
+    var g = parseInt(hexcolor.substr(2, 2), 16);
+    var b = parseInt(hexcolor.substr(4, 2), 16);
+    var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? '#333333' : '#ffffff';
+  }
+
+  function saveTheme() {
+    theme.userBubbleColor = document.getElementById('user-bubble-color').value;
+    theme.aiBubbleColor = document.getElementById('ai-bubble-color').value;
+    theme.bubbleRadius = document.getElementById('bubble-radius').value;
+    theme.fontFamily = document.getElementById('font-family').value;
+    
+    localStorage.setItem('myThemeConfig', JSON.stringify(theme));
+    alert('主题已保存！去聊天室看看吧。');
+    window.location.href = 'index.html';
+  }
+
+  // 页面加载先跑一次
+  applyPreview();
+</script>
+</body>
+</html>
