@@ -8,14 +8,17 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     height: 100vh; display: flex; flex-direction: column;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f2f2f7; color: #333; overflow: hidden;
+    font-family: var(--theme-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    background: var(--bg-image, #f2f2f7) center/cover no-repeat fixed; 
+    color: #333; overflow: hidden;
   }
 
   /* 顶部导航 */
   .header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 15px 20px; background: #fff; box-shadow: 0 1px 8px rgba(0,0,0,0.05); z-index: 10;
+    padding: 15px 20px; background: rgba(255, 255, 255, 0.7); 
+    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.05); z-index: 10;
   }
   .back-btn { font-size: 20px; color: #007aff; text-decoration: none; font-weight: 600; cursor: pointer; }
   .header-title { font-size: 17px; font-weight: 600; }
@@ -26,10 +29,11 @@
 
   .avatar-card {
     position: relative; display: flex; align-items: center; width: 100%; padding: 15px;
-    background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border-radius: 16px; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
     cursor: pointer; transition: all 0.2s ease; user-select: none; text-decoration: none; color: inherit;
   }
-  .avatar-card:active { background: #f9f9f9; }
+  .avatar-card:active { background: #f9f9f9; transform: scale(0.98); }
   .avatar-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 1px solid #eee; background: #ccc; }
   .avatar-info h3 { margin: 0 0 4px 0; font-size: 16px; }
   .avatar-info p { margin: 0; font-size: 12px; color: #888; }
@@ -76,7 +80,7 @@
       <input type="text" id="inputName" placeholder="角色ID（不可重复）" maxlength="15">
       <input type="text" id="inputDesc" placeholder="卡片描述（如：点击进入）" maxlength="15">
       <div class="file-upload-wrapper">
-        <label>上传角色头像</label>
+        <label>上传角色头像 (会自动压缩)</label>
         <input type="file" id="inputFile" accept="image/*">
         <input type="text" id="inputUrl" placeholder="或填入图片网络链接">
       </div>
@@ -88,6 +92,13 @@
   </div>
 
 <script>
+  // 1. 动态应用壁纸和字体
+  const bg = localStorage.getItem('globalBgImage');
+  if(bg) document.body.style.background = `url(${bg}) center/cover no-repeat fixed`;
+  let theme = JSON.parse(localStorage.getItem('myThemeConfig')) || {};
+  if(theme.fontFamily) document.body.style.fontFamily = theme.fontFamily;
+
+  // 2. 卡片逻辑
   let cards = JSON.parse(localStorage.getItem('myPhoneCards')) || [ { name: '默认角色', desc: '点击进入聊天', link: 'chat.html', img: '' } ];
   let editingIndex = -1; let tempBase64 = '';
 
@@ -142,7 +153,7 @@
   function saveCard() {
     const name = document.getElementById('inputName').value.trim(); if (!name) return alert('请填写角色ID！');
     const desc = document.getElementById('inputDesc').value.trim() || '点击进入';
-    const link = 'chat.html'; // 写死，省得你填错
+    const link = 'chat.html';
     let img = tempBase64 || document.getElementById('inputUrl').value.trim() || '';
     
     if (editingIndex >= 0) {
@@ -197,12 +208,10 @@
     this.textContent = isEditing ? '完成' : '编辑';
   });
 
-  // 双击空白区域添加
   document.getElementById('card-container').addEventListener('dblclick', function(e) {
     if (e.target === this && this.classList.contains('editing')) { openModal(-1); }
   });
 
-  // 如果没卡片，给个添加提示
   window.addEventListener('pageshow', renderCards);
   renderCards();
 </script>
