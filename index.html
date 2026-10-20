@@ -13,12 +13,10 @@
     color: #333; overflow: hidden; position: relative; user-select: none;
   }
 
-  /* 顶部时间 */
   .top-section { text-align: center; width: 100%; margin-bottom: 30px; pointer-events: none; }
   #time { font-size: 76px; font-weight: 300; margin: 0; line-height: 1; letter-spacing: 2px; text-shadow: 0 2px 10px rgba(255,255,255,0.5); }
   #date { font-size: 16px; color: #444; margin-top: 8px; font-weight: 500; text-shadow: 0 1px 5px rgba(255,255,255,0.5); }
 
-  /* 桌面 App 网格 */
   .app-grid {
     display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 25px 15px; width: 90%; max-width: 380px; padding: 10px;
@@ -28,19 +26,23 @@
   .app-icon-wrapper {
     display: flex; flex-direction: column; align-items: center; gap: 8px;
     text-decoration: none; color: inherit; cursor: pointer; position: relative;
-    transition: transform 0.2s ease; touch-action: none; /* 允许拖拽 */
+    transition: transform 0.2s ease; touch-action: none;
   }
 
-  /* 图标本体：iOS 质感 */
+  /* 图标本体 */
   .app-icon {
     width: 60px; height: 60px; border-radius: 14px;
     display: flex; justify-content: center; align-items: center;
     font-size: 30px; color: #fff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.4);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     background-size: cover; background-position: center;
-    overflow: hidden; position: relative;
+    overflow: hidden; position: relative; transition: all 0.3s;
+    /* 应用全局材质变量 */
+    backdrop-filter: var(--material-blur, none);
+    -webkit-backdrop-filter: var(--material-blur, none);
+    border: var(--material-border, none);
   }
-  /* 图标内部的高光质感 */
+  
   .app-icon::after {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
     background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent); pointer-events: none;
@@ -48,41 +50,28 @@
   
   .app-icon-wrapper span { font-size: 12px; font-weight: 500; color: #333; text-shadow: 0 1px 3px rgba(255,255,255,0.8); }
 
-  /* 各个默认图标的渐变色 */
-  .icon-chat { background: linear-gradient(135deg, #007aff, #00c6ff); }
-  .icon-settings { background: linear-gradient(135deg, #8e8e93, #c7c7cc); }
-  .icon-theme { background: linear-gradient(135deg, #ff9500, #ffcc00); }
-  .icon-about { background: linear-gradient(135deg, #34c759, #30d158); }
+  .icon-chat { background-color: var(--icon-chat-bg, #007aff); background-image: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%); }
+  .icon-settings { background-color: var(--icon-set-bg, #8e8e93); background-image: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%); }
+  .icon-theme { background-color: var(--icon-thm-bg, #ff9500); background-image: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%); }
+  .icon-about { background-color: var(--icon-abt-bg, #34c759); background-image: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%); }
 
-  /* 长按编辑时的抖动动画 */
-  @keyframes shake {
-    0% { transform: rotate(0deg); }
-    25% { transform: rotate(-3deg); }
-    50% { transform: rotate(0deg); }
-    75% { transform: rotate(3deg); }
-    100% { transform: rotate(0deg); }
-  }
+  @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(-3deg); } 50% { transform: rotate(0deg); } 75% { transform: rotate(3deg); } 100% { transform: rotate(0deg); } }
   .app-grid.editing .app-icon-wrapper { animation: shake 0.3s infinite; }
   .app-grid.editing .app-icon-wrapper:active { transform: scale(0.9); opacity: 0.8; }
   
-  /* 编辑模式下，图标左上角出现删除按钮 */
-  .delete-app-btn {
-    position: absolute; top: -5px; left: -5px; width: 20px; height: 20px;
-    background: #ff3b30; color: #fff; border-radius: 50%; font-size: 14px;
-    display: none; justify-content: center; align-items: center; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
+  .delete-app-btn { position: absolute; top: -5px; left: -5px; width: 20px; height: 20px; background: #ff3b30; color: #fff; border-radius: 50%; font-size: 14px; display: none; justify-content: center; align-items: center; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
   .app-grid.editing .delete-app-btn { display: flex; }
 
-  /* Dock 栏 */
   .dock {
-    background: rgba(255,255,255,0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    background: var(--panel-bg, rgba(255,255,255,0.5)); 
+    backdrop-filter: var(--material-blur, blur(20px)); -webkit-backdrop-filter: var(--material-blur, blur(20px));
+    border: var(--material-border, none);
     border-radius: 30px; padding: 15px 25px; display: flex; gap: 20px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1); margin-top: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1); margin-top: 20px; transition: all 0.3s;
   }
   .dock .app-icon-wrapper span { display: none; }
   .dock .app-icon { box-shadow: none; }
 
-  /* 弹窗通用 */
   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); }
   .modal-overlay.active { display: flex; }
   .modal-box { background: #fff; width: 85%; max-width: 350px; border-radius: 24px; padding: 25px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); max-height: 85vh; overflow-y: auto; }
@@ -96,7 +85,6 @@
   .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 15px; font-weight: 500; cursor: pointer; }
   .btn-cancel { background: #f2f2f7; color: #666; }
   .btn-save { background: #007aff; color: #fff; }
-  .btn-danger { background: #ff3b30; color: #fff; }
 </style>
 </head>
 <body>
@@ -106,15 +94,9 @@
     <div id="time"></div>
   </div>
 
-  <div class="app-grid" id="app-grid">
-    <!-- JS 动态渲染 -->
-  </div>
+  <div class="app-grid" id="app-grid"></div>
+  <div class="dock" id="dock"></div>
 
-  <div class="dock" id="dock">
-    <!-- 固定几个常用的 -->
-  </div>
-
-  <!-- 全局设置弹窗 -->
   <div class="modal-overlay" id="global-modal">
     <div class="modal-box">
       <h2>⚙️ 全局设置</h2>
@@ -123,12 +105,6 @@
       <div class="file-upload-wrapper" style="margin-bottom:10px;">
         <label>上传我的头像</label>
         <input type="file" id="user-avatar-file" accept="image/*">
-      </div>
-      <p style="font-size:12px; color:#007aff; margin-bottom:-10px;">【美化壁纸】</p>
-      <div class="file-upload-wrapper" style="margin-bottom:10px;">
-        <label>上传桌面壁纸</label>
-        <input type="file" id="global-bg-file" accept="image/*">
-        <input type="text" id="global-bg-url" placeholder="或填入壁纸链接">
       </div>
       <p style="font-size:12px; color:#007aff; margin-bottom:-10px;">【API 配置】</p>
       <select id="global-provider"><option value="deepseek">DeepSeek</option><option value="zhipu">智谱 GLM</option></select>
@@ -141,12 +117,11 @@
     </div>
   </div>
 
-  <!-- 编辑 App 弹窗 -->
   <div class="modal-overlay" id="edit-app-modal">
     <div class="modal-box">
       <h2>📱 编辑应用</h2>
-      <input type="text" id="edit-app-name" placeholder="应用名称 (如：微信)">
-      <input type="text" id="edit-app-url" placeholder="跳转链接 (如：chats.html)">
+      <input type="text" id="edit-app-name" placeholder="应用名称">
+      <input type="text" id="edit-app-url" placeholder="跳转链接">
       <div class="file-upload-wrapper">
         <label>自定义图标图片 (不传则保留默认)</label>
         <input type="file" id="edit-app-file" accept="image/*">
@@ -159,7 +134,24 @@
   </div>
 
 <script>
-  /* ======= 时间逻辑 ======= */
+  // 应用材质 CSS 变量
+  let themeConfig = JSON.parse(localStorage.getItem('myThemeConfig')) || {};
+  const root = document.documentElement;
+  if (themeConfig.material === 'frosted') {
+    root.style.setProperty('--panel-bg', 'rgba(255,255,255,0.6)');
+    root.style.setProperty('--material-blur', 'blur(15px)');
+    root.style.setProperty('--material-border', '1px solid rgba(255,255,255,0.3)');
+  } else if (themeConfig.material === 'glass') {
+    root.style.setProperty('--panel-bg', 'rgba(255,255,255,0.2)');
+    root.style.setProperty('--material-blur', 'blur(20px) saturate(180%)');
+    root.style.setProperty('--material-border', '1px solid rgba(255,255,255,0.6)');
+    // 如果是水玻璃，修改图标颜色为半透明
+    root.style.setProperty('--icon-chat-bg', 'rgba(0,122,255,0.6)');
+    root.style.setProperty('--icon-set-bg', 'rgba(142,142,147,0.6)');
+    root.style.setProperty('--icon-thm-bg', 'rgba(255,149,0,0.6)');
+    root.style.setProperty('--icon-abt-bg', 'rgba(52,199,89,0.6)');
+  }
+
   function pad(n) { return String(n).padStart(2, '0'); }
   var WEEK = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
   function tick() {
@@ -169,8 +161,6 @@
   }
   tick(); setInterval(tick, 1000);
 
-  /* ======= 桌面 App 数据与拖拽逻辑 ======= */
-  // 默认 App 列表
   const defaultApps = [
     { id: 'chat', name: '消息', icon: '💬', url: 'chats.html', colorClass: 'icon-chat' },
     { id: 'theme', name: '美化', icon: '🎨', url: 'theme.html', colorClass: 'icon-theme' },
@@ -179,219 +169,129 @@
   ];
 
   let apps = JSON.parse(localStorage.getItem('myAppList')) || defaultApps;
-  let isEditingApps = false;
-  let editingAppIndex = -1;
-  let tempAppBase64 = '';
+  let isEditingApps = false; let editingAppIndex = -1; let tempAppBase64 = '';
 
-  const grid = document.getElementById('app-grid');
-  const dock = document.getElementById('dock');
-
-  // 渲染 App
   function renderApps() {
-    grid.innerHTML = '';
-    dock.innerHTML = '';
-
+    const grid = document.getElementById('app-grid'); const dock = document.getElementById('dock');
+    grid.innerHTML = ''; dock.innerHTML = '';
     apps.forEach((app, index) => {
       const wrapper = document.createElement('div');
-      wrapper.className = 'app-icon-wrapper';
-      wrapper.dataset.index = index;
-      
-      // 如果自定义了图标图片，就用图片，否则用 emoji
+      wrapper.className = 'app-icon-wrapper'; wrapper.dataset.index = index;
       const iconContent = app.customImg ? '' : app.icon;
       const iconStyle = app.customImg ? `background-image: url(${app.customImg});` : '';
-
       wrapper.innerHTML = `
         <div class="delete-app-btn" onclick="deleteApp(event, ${index})">×</div>
         <div class="app-icon ${app.customImg ? '' : app.colorClass}" style="${iconStyle}">${iconContent}</div>
         <span>${app.name}</span>
       `;
-
-      // 拖拽事件
       wrapper.addEventListener('touchstart', handleTouchStart, {passive: false});
       wrapper.addEventListener('touchmove', handleTouchMove, {passive: false});
       wrapper.addEventListener('touchend', handleTouchEnd);
-      
-      // 点击与长按
       let pressTimer;
-      wrapper.addEventListener('mousedown', (e) => {
-        pressTimer = setTimeout(() => enterEditMode(), 500);
-      });
+      wrapper.addEventListener('mousedown', () => { pressTimer = setTimeout(enterEditMode, 500); });
       wrapper.addEventListener('mouseup', () => clearTimeout(pressTimer));
       wrapper.addEventListener('click', (e) => {
-        if (isEditingApps) {
-          e.preventDefault();
-          openEditApp(index);
-        } else if (app.url.startsWith('javascript:')) {
-          eval(app.url.replace('javascript:', ''));
-        } else {
-          window.location.href = app.url;
-        }
+        if (isEditingApps) { e.preventDefault(); openEditApp(index); }
+        else if (app.url.startsWith('javascript:')) { eval(app.url.replace('javascript:', '')); }
+        else { window.location.href = app.url; }
       });
-
-      // 前 4 个放主屏幕，后面的塞 dock
-      if (index < 4) grid.appendChild(wrapper);
-      else dock.appendChild(wrapper);
+      if (index < 4) grid.appendChild(wrapper); else dock.appendChild(wrapper);
     });
   }
 
-  // 长按进入编辑模式
-  function enterEditMode() {
-    isEditingApps = true;
-    grid.classList.add('editing');
-    // 点击空白处退出编辑
-    document.body.addEventListener('click', exitEditMode, { once: true });
-  }
+  function enterEditMode() { isEditingApps = true; document.getElementById('app-grid').classList.add('editing'); document.body.addEventListener('click', exitEditMode, { once: true }); }
+  function exitEditMode(e) { if (e.target.closest('.app-icon-wrapper') || e.target.closest('.modal-overlay')) return; isEditingApps = false; document.getElementById('app-grid').classList.remove('editing'); }
+  function deleteApp(e, index) { e.stopPropagation(); if (confirm(`确定要移除【${apps[index].name}】吗？`)) { apps.splice(index, 1); localStorage.setItem('myAppList', JSON.stringify(apps)); renderApps(); } }
 
-  function exitEditMode(e) {
-    if (e.target.closest('.app-icon-wrapper') || e.target.closest('.modal-overlay')) return;
-    isEditingApps = false;
-    grid.classList.remove('editing');
-  }
-
-  // 删除 App
-  function deleteApp(e, index) {
-    e.stopPropagation();
-    if (confirm(`确定要移除【${apps[index].name}】吗？`)) {
-      apps.splice(index, 1);
-      localStorage.setItem('myAppList', JSON.stringify(apps));
-      renderApps();
-    }
-  }
-
-  /* ======= 拖拽排序逻辑（简化版 Pointer Events） ======= */
-  let draggedItem = null;
-  let startX, startY;
-
+  let draggedItem = null; let startX, startY;
   function handleTouchStart(e) {
     if (!isEditingApps) return;
     draggedItem = e.target.closest('.app-icon-wrapper');
     if (!draggedItem) return;
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    draggedItem.style.zIndex = 100;
-    draggedItem.style.opacity = '0.8';
+    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+    draggedItem.style.zIndex = 100; draggedItem.style.opacity = '0.8';
   }
-
   function handleTouchMove(e) {
     if (!draggedItem) return;
     e.preventDefault();
     const touch = e.touches[0];
     draggedItem.style.transform = `translate(${touch.clientX - startX}px, ${touch.clientY - startY}px)`;
-    
-    // 寻找目标元素
-    const elementAtPoint = document.elementFromPoint(touch.clientX, touch.clientY);
-    const targetItem = elementAtPoint?.closest('.app-icon-wrapper');
-    
+    const targetItem = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.app-icon-wrapper');
     if (targetItem && targetItem !== draggedItem && targetItem.parentNode === draggedItem.parentNode) {
       const items = Array.from(draggedItem.parentNode.children);
-      const draggedIndex = items.indexOf(draggedItem);
-      const targetIndex = items.indexOf(targetItem);
-      
-      if (draggedIndex < targetIndex) {
-        targetItem.after(draggedItem);
-      } else {
-        targetItem.before(draggedItem);
-      }
+      if (items.indexOf(draggedItem) < items.indexOf(targetItem)) targetItem.after(draggedItem);
+      else targetItem.before(draggedItem);
     }
   }
-
   function handleTouchEnd() {
     if (!draggedItem) return;
-    draggedItem.style.transform = '';
-    draggedItem.style.zIndex = '';
-    draggedItem.style.opacity = '';
-    draggedItem = null;
-    
-    // 保存新的排序
+    draggedItem.style.transform = ''; draggedItem.style.zIndex = ''; draggedItem.style.opacity = ''; draggedItem = null;
     const newOrder = [];
-    const wrappers = [...grid.querySelectorAll('.app-icon-wrapper'), ...dock.querySelectorAll('.app-icon-wrapper')];
-    wrappers.forEach(w => {
-      newOrder.push(apps[parseInt(w.dataset.index)]);
-    });
-    apps = newOrder;
-    localStorage.setItem('myAppList', JSON.stringify(apps));
-    renderApps(); // 重新渲染修正索引
+    [...document.getElementById('app-grid').querySelectorAll('.app-icon-wrapper'), ...document.getElementById('dock').querySelectorAll('.app-icon-wrapper')].forEach(w => newOrder.push(apps[parseInt(w.dataset.index)]));
+    apps = newOrder; localStorage.setItem('myAppList', JSON.stringify(apps)); renderApps();
   }
 
-  /* ======= 编辑 App 弹窗逻辑 ======= */
   function openEditApp(index) {
-    editingAppIndex = index;
-    tempAppBase64 = '';
+    editingAppIndex = index; tempAppBase64 = '';
     document.getElementById('edit-app-name').value = apps[index].name;
     document.getElementById('edit-app-url').value = apps[index].url;
     document.getElementById('edit-app-file').value = '';
     document.getElementById('edit-app-modal').classList.add('active');
   }
-
-  function closeEditApp() {
-    document.getElementById('edit-app-modal').classList.remove('active');
-  }
-
+  function closeEditApp() { document.getElementById('edit-app-modal').classList.remove('active'); }
   function saveEditApp() {
     apps[editingAppIndex].name = document.getElementById('edit-app-name').value.trim();
     apps[editingAppIndex].url = document.getElementById('edit-app-url').value.trim();
     if (tempAppBase64) apps[editingAppIndex].customImg = tempAppBase64;
-    
-    localStorage.setItem('myAppList', JSON.stringify(apps));
-    renderApps();
-    closeEditApp();
+    localStorage.setItem('myAppList', JSON.stringify(apps)); renderApps(); closeEditApp();
   }
+  document.getElementById('edit-app-file').addEventListener('change', function(e) { const file = e.target.files[0]; if (!file) return; compressImage(file, 150, 150, function(base64) { tempAppBase64 = base64; }); });
 
-  document.getElementById('edit-app-file').addEventListener('change', function(e) {
-    const file = e.target.files[0]; if (!file) return;
-    compressImage(file, 150, 150, function(base64) { tempAppBase64 = base64; });
-  });
-
-  /* ======= 全局设置（壁纸与API） ======= */
-  let tempBgBase64 = '';
+  let globalConfig = JSON.parse(localStorage.getItem('globalApiConfig')) || { provider: 'deepseek', key: '', model: 'deepseek-chat' };
+  let globalUser = JSON.parse(localStorage.getItem('globalUserConfig')) || { nickname: '我', avatar: '' };
+  let tempUserBase64 = '';
   function openGlobalSettings() {
-    // 省略具体的读取代码...
+    document.getElementById('user-nickname').value = globalUser.nickname || '';
+    document.getElementById('user-avatar-file').value = '';
+    document.getElementById('global-provider').value = globalConfig.provider;
+    document.getElementById('global-key').value = globalConfig.key;
+    document.getElementById('global-model').value = globalConfig.model;
     document.getElementById('global-modal').classList.add('active');
   }
   function closeGlobalSettings() { document.getElementById('global-modal').classList.remove('active'); }
   function saveGlobalSettings() {
-    // 保存壁纸
-    const bgUrl = document.getElementById('global-bg-url').value.trim();
-    const finalBg = tempBgBase64 || bgUrl || '';
-    if(finalBg) localStorage.setItem('globalBgImage', finalBg);
-    applyGlobalStyle();
-    closeGlobalSettings(); alert('设置已保存');
+    globalUser.nickname = document.getElementById('user-nickname').value.trim();
+    if(tempUserBase64) globalUser.avatar = tempUserBase64;
+    localStorage.setItem('globalUserConfig', JSON.stringify(globalUser));
+    globalConfig.provider = document.getElementById('global-provider').value;
+    globalConfig.key = document.getElementById('global-key').value.trim();
+    globalConfig.model = document.getElementById('global-model').value.trim();
+    localStorage.setItem('globalApiConfig', JSON.stringify(globalConfig));
+    closeGlobalSettings(); alert('全局设置已保存！');
   }
+  document.getElementById('user-avatar-file').addEventListener('change', function(e) { const file = e.target.files[0]; if (!file) return; compressImage(file, 150, 150, function(base64) { tempUserBase64 = base64; }); });
 
-  function applyGlobalStyle() {
-    const bg = localStorage.getItem('globalBgImage');
-    if(bg) document.body.style.background = `url(${bg}) center/cover no-repeat fixed`;
-    else document.body.style.background = '#f2f2f7';
-  }
-
-  document.getElementById('global-bg-file').addEventListener('change', function(e) {
-    const file = e.target.files[0]; if (!file) return;
-    compressImage(file, 1080, 1920, function(base64) { tempBgBase64 = base64; });
-  });
-
-  /* ======= 图片压缩 ======= */
   function compressImage(file, maxWidth, maxHeight, callback) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
+    const reader = new FileReader(); reader.readAsDataURL(file);
     reader.onload = function(e) {
-      const img = new Image();
-      img.src = e.target.result;
+      const img = new Image(); img.src = e.target.result;
       img.onload = function() {
-        let width = img.width; let height = img.height;
+        let width = img.width, height = img.height;
         if (width > maxWidth || height > maxHeight) {
           if (width / height > maxWidth / maxHeight) { height = Math.round(height * maxWidth / width); width = maxWidth; } 
           else { width = Math.round(width * maxHeight / height); height = maxHeight; }
         }
-        const canvas = document.createElement('canvas');
-        canvas.width = width; canvas.height = height;
+        const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
         const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
         callback(canvas.toDataURL('image/jpeg', 0.8));
       };
     };
   }
 
-  /* ======= 初始化 ======= */
-  applyGlobalStyle();
+  const bg = localStorage.getItem('bgImageMain');
+  if(bg) document.body.style.background = `url(${bg}) center/cover no-repeat fixed`;
+  else document.body.style.background = '#f2f2f7';
+  
   renderApps();
 </script>
 </body>
