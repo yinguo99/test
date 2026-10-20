@@ -14,11 +14,32 @@
 
   .content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
   
-  /* 预览区 */
-  .preview-area { background: #e5e5ea; padding: 15px; border-radius: 16px; display: flex; flex-direction: column; gap: 10px; }
-  .preview-msg { max-width: 80%; padding: 10px 15px; font-size: 14px; }
-  .preview-msg.ai { background: var(--bubble-ai-bg, #fff); color: var(--bubble-ai-text, #333); border-radius: var(--bubble-radius, 18px); border-top-left-radius: 4px; align-self: flex-start; }
-  .preview-msg.user { background: var(--bubble-user-bg, #007aff); color: var(--bubble-user-text, #fff); border-radius: var(--bubble-radius, 18px); border-top-right-radius: 4px; align-self: flex-end; }
+  /* 预览区：加个花背景才能看出玻璃效果 */
+  .preview-area { 
+    background: url('https://picsum.photos/400/200') center/cover; 
+    padding: 15px; border-radius: 16px; display: flex; flex-direction: column; gap: 10px; 
+    position: relative;
+  }
+  .preview-msg { max-width: 80%; padding: 10px 15px; font-size: 14px; transition: all 0.3s; }
+  
+  .preview-msg.ai { 
+    background: var(--bubble-ai-bg, rgba(255,255,255,0.7)); 
+    color: var(--bubble-ai-text, #333); 
+    border-radius: var(--bubble-radius, 18px); 
+    border-top-left-radius: 4px; align-self: flex-start; 
+    backdrop-filter: var(--material-blur, blur(10px));
+    -webkit-backdrop-filter: var(--material-blur, blur(10px));
+    border: var(--material-border, 1px solid rgba(255,255,255,0.4));
+  }
+  .preview-msg.user { 
+    background: var(--bubble-user-bg, rgba(0,122,255,0.7)); 
+    color: var(--bubble-user-text, #fff); 
+    border-radius: var(--bubble-radius, 18px); 
+    border-top-right-radius: 4px; align-self: flex-end; 
+    backdrop-filter: var(--material-blur, blur(10px));
+    -webkit-backdrop-filter: var(--material-blur, blur(10px));
+    border: var(--material-border, 1px solid rgba(255,255,255,0.4));
+  }
 
   /* 控制区 */
   .control-group { background: #fff; padding: 15px; border-radius: 16px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
@@ -27,6 +48,11 @@
   .control-item input[type="color"] { width: 40px; height: 40px; border: none; border-radius: 8px; cursor: pointer; background: none; padding: 0; }
   .control-item input[type="range"] { width: 150px; }
   .control-item select { padding: 8px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
+
+  /* 壁纸上传区 */
+  .file-upload-wrapper { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+  .file-upload-wrapper label { font-size: 12px; color: #666; }
+  .file-upload-wrapper input[type="file"], .file-upload-wrapper input[type="text"] { width: 100%; padding: 10px; border: 1px dashed #ccc; background: #fafafa; border-radius: 10px; font-size: 12px; outline: none; }
 </style>
 </head>
 <body>
@@ -40,9 +66,36 @@
   <div class="content">
     <!-- 实时预览 -->
     <div class="preview-area" id="preview-area">
-      <p style="text-align:center; font-size:12px; color:#888; margin-bottom:10px;">实时预览</p>
       <div class="preview-msg ai" id="preview-ai">今天天气不错，要一起出去走走吗？</div>
       <div class="preview-msg user" id="preview-user">好呀，等我换件衣服！</div>
+    </div>
+
+    <!-- 全局材质设置 -->
+    <div class="control-group">
+      <h3 style="font-size: 14px; color: #666;">【全局材质】</h3>
+      <div class="control-item">
+        <label>UI 材质效果</label>
+        <select id="material" onchange="applyPreview()">
+          <option value="solid">实心 (纯色)</option>
+          <option value="frosted">磨砂玻璃 (高斯模糊)</option>
+          <option value="glass">透明水玻璃 (高光通透)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 壁纸设置 -->
+    <div class="control-group">
+      <h3 style="font-size: 14px; color: #666;">【壁纸设置】</h3>
+      <div class="file-upload-wrapper">
+        <label>1. 主页 & 消息列表壁纸</label>
+        <input type="file" id="bg-main-file" accept="image/*">
+        <input type="text" id="bg-main-url" placeholder="或填入图片网络链接">
+      </div>
+      <div class="file-upload-wrapper" style="margin-top: 10px;">
+        <label>2. 聊天页专属壁纸 (留空则共用上方)</label>
+        <input type="file" id="bg-chat-file" accept="image/*">
+        <input type="text" id="bg-chat-url" placeholder="或填入图片网络链接">
+      </div>
     </div>
 
     <!-- 气泡设置 -->
@@ -79,64 +132,120 @@
   </div>
 
 <script>
-  // 读取现有主题配置
   let theme = JSON.parse(localStorage.getItem('myThemeConfig')) || {
-    userBubbleColor: '#007aff',
-    aiBubbleColor: '#ffffff',
-    bubbleRadius: '18',
-    fontFamily: '-apple-system, sans-serif'
+    userBubbleColor: '#007aff', aiBubbleColor: '#ffffff', bubbleRadius: '18', fontFamily: '-apple-system, sans-serif', material: 'solid'
   };
+  
+  const currentBgMain = localStorage.getItem('bgImageMain') || '';
+  const currentBgChat = localStorage.getItem('bgImageChat') || '';
+  document.getElementById('bg-main-url').value = currentBgMain.startsWith('data:') ? '' : currentBgMain;
+  document.getElementById('bg-chat-url').value = currentBgChat.startsWith('data:') ? '' : currentBgChat;
 
-  // 初始化控件
   document.getElementById('user-bubble-color').value = theme.userBubbleColor;
   document.getElementById('ai-bubble-color').value = theme.aiBubbleColor;
   document.getElementById('bubble-radius').value = theme.bubbleRadius;
   document.getElementById('radius-val').textContent = theme.bubbleRadius + 'px';
   document.getElementById('font-family').value = theme.fontFamily;
+  document.getElementById('material').value = theme.material || 'solid';
 
-  // 实时预览函数 (通过改变 CSS 变量)
+  function hexToRgb(hex) {
+    hex = hex.replace("#", "");
+    var r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
+    return `${r},${g},${b}`;
+  }
+
   function applyPreview() {
+    const root = document.documentElement;
+    const radius = document.getElementById('bubble-radius').value;
+    const mat = document.getElementById('material').value;
     const uColor = document.getElementById('user-bubble-color').value;
     const aColor = document.getElementById('ai-bubble-color').value;
-    const radius = document.getElementById('bubble-radius').value;
-    const font = document.getElementById('font-family').value;
 
     document.getElementById('radius-val').textContent = radius + 'px';
-
-    // 应用到根元素
-    const root = document.documentElement;
-    root.style.setProperty('--bubble-user-bg', uColor);
-    root.style.setProperty('--bubble-ai-bg', aColor);
+    
+    // 颜色处理
+    root.style.setProperty('--bubble-user-rgb', hexToRgb(uColor));
+    root.style.setProperty('--bubble-ai-rgb', hexToRgb(aColor));
     root.style.setProperty('--bubble-radius', radius + 'px');
-    root.style.setProperty('--theme-font', font);
-
-    // 智能处理文字颜色：如果气泡太亮，字就变黑；太暗，字就变白
     root.style.setProperty('--bubble-user-text', getContrastColor(uColor));
     root.style.setProperty('--bubble-ai-text', getContrastColor(aColor));
+
+    // 材质处理 (通过控制透明度和模糊)
+    if (mat === 'solid') {
+      root.style.setProperty('--bubble-user-bg', `rgb(${hexToRgb(uColor)})`);
+      root.style.setProperty('--bubble-ai-bg', `rgb(${hexToRgb(aColor)})`);
+      root.style.setProperty('--material-blur', 'none');
+      root.style.setProperty('--material-border', 'none');
+      root.style.setProperty('--panel-bg', 'rgba(255,255,255,0.95)');
+    } else if (mat === 'frosted') {
+      root.style.setProperty('--bubble-user-bg', `rgba(${hexToRgb(uColor)}, 0.75)`);
+      root.style.setProperty('--bubble-ai-bg', `rgba(${hexToRgb(aColor)}, 0.75)`);
+      root.style.setProperty('--material-blur', 'blur(15px)');
+      root.style.setProperty('--material-border', '1px solid rgba(255,255,255,0.3)');
+      root.style.setProperty('--panel-bg', 'rgba(255,255,255,0.6)');
+    } else if (mat === 'glass') {
+      root.style.setProperty('--bubble-user-bg', `rgba(${hexToRgb(uColor)}, 0.35)`);
+      root.style.setProperty('--bubble-ai-bg', `rgba(${hexToRgb(aColor)}, 0.35)`);
+      root.style.setProperty('--material-blur', 'blur(20px) saturate(180%)');
+      root.style.setProperty('--material-border', '1px solid rgba(255,255,255,0.6)');
+      root.style.setProperty('--panel-bg', 'rgba(255,255,255,0.2)');
+    }
   }
 
-  // 获取对比色 (十六进制变黑白)
   function getContrastColor(hexcolor) {
     hexcolor = hexcolor.replace("#", "");
-    var r = parseInt(hexcolor.substr(0, 2), 16);
-    var g = parseInt(hexcolor.substr(2, 2), 16);
-    var b = parseInt(hexcolor.substr(4, 2), 16);
-    var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    return (yiq >= 128) ? '#333333' : '#ffffff';
+    var r = parseInt(hexcolor.substr(0, 2), 16), g = parseInt(hexcolor.substr(2, 2), 16), b = parseInt(hexcolor.substr(4, 2), 16);
+    return (((r * 299) + (g * 587) + (b * 114)) / 1000 >= 128) ? '#333333' : '#ffffff';
   }
+
+  let tempBgMainBase64 = ''; let tempBgChatBase64 = '';
+  function compressImage(file, maxWidth, maxHeight, callback) {
+    const reader = new FileReader(); reader.readAsDataURL(file);
+    reader.onload = function(e) {
+      const img = new Image(); img.src = e.target.result;
+      img.onload = function() {
+        let width = img.width, height = img.height;
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) { height = Math.round(height * maxWidth / width); width = maxWidth; } 
+          else { width = Math.round(width * maxHeight / height); height = maxHeight; }
+        }
+        const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+        callback(canvas.toDataURL('image/jpeg', 0.8));
+      };
+    };
+  }
+
+  document.getElementById('bg-main-file').addEventListener('change', function(e) {
+    const file = e.target.files[0]; if (!file) return;
+    compressImage(file, 1080, 1920, function(base64) { tempBgMainBase64 = base64; });
+  });
+  document.getElementById('bg-chat-file').addEventListener('change', function(e) {
+    const file = e.target.files[0]; if (!file) return;
+    compressImage(file, 1080, 1920, function(base64) { tempBgChatBase64 = base64; });
+  });
 
   function saveTheme() {
     theme.userBubbleColor = document.getElementById('user-bubble-color').value;
     theme.aiBubbleColor = document.getElementById('ai-bubble-color').value;
     theme.bubbleRadius = document.getElementById('bubble-radius').value;
     theme.fontFamily = document.getElementById('font-family').value;
-    
+    theme.material = document.getElementById('material').value;
     localStorage.setItem('myThemeConfig', JSON.stringify(theme));
-    alert('主题已保存！去聊天室看看吧。');
+    
+    const urlMain = document.getElementById('bg-main-url').value.trim();
+    const urlChat = document.getElementById('bg-chat-url').value.trim();
+    if (tempBgMainBase64) localStorage.setItem('bgImageMain', tempBgMainBase64);
+    else if (urlMain) localStorage.setItem('bgImageMain', urlMain);
+    else localStorage.removeItem('bgImageMain');
+
+    if (tempBgChatBase64) localStorage.setItem('bgImageChat', tempBgChatBase64);
+    else if (urlChat) localStorage.setItem('bgImageChat', urlChat);
+    else localStorage.removeItem('bgImageChat');
+
+    alert('主题与材质已保存！');
     window.location.href = 'index.html';
   }
-
-  // 页面加载先跑一次
   applyPreview();
 </script>
 </body>
