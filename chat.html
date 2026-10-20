@@ -8,36 +8,41 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { height: 100vh; display: flex; flex-direction: column; background: #f5f5f7; font-family: var(--theme-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif); color: #333; overflow: hidden; }
   
-  /* 顶部导航 (毛玻璃) */
-  .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 1px 8px rgba(0,0,0,0.05); z-index: 10; }
+  .chat-header { 
+    display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; 
+    background: var(--panel-bg, rgba(255, 255, 255, 0.7)); 
+    backdrop-filter: var(--material-blur, blur(15px)); -webkit-backdrop-filter: var(--material-blur, blur(15px)); 
+    border-bottom: var(--material-border, none);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.05); z-index: 10; transition: all 0.3s;
+  }
   .back-btn { font-size: 20px; color: #007aff; text-decoration: none; font-weight: 600; cursor: pointer; }
   .header-title { font-size: 17px; font-weight: 600; }
   .settings-btn { font-size: 20px; cursor: pointer; color: #888; padding: 5px; }
 
-  /* 聊天区域 (毛玻璃 + 透底) */
   .chat-messages { 
     flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; 
-    background: rgba(245, 245, 247, 0.3); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+    background: rgba(245, 245, 247, 0.1); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
   }
   
-  /* 消息行容器 (包含头像和气泡) */
   .message-row { display: flex; align-items: flex-start; width: 100%; gap: 10px; animation: fadeIn 0.3s ease; }
   .message-row.user { flex-direction: row-reverse; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* 头像 */
   .msg-avatar { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: #ddd; flex-shrink: 0; border: 1px solid #eee; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
   
-  /* 气泡 (应用主题工坊的动态变量) */
+  /* 气泡：材质由 JS 动态注入的 CSS 变量控制 */
   .message { 
     max-width: 70%; padding: 12px 16px; 
     border-radius: var(--bubble-radius, 18px); 
     font-size: 15px; line-height: 1.5; word-wrap: break-word; position: relative; 
     font-family: var(--theme-font, inherit); 
+    border: var(--bubble-border, none);
+    backdrop-filter: var(--bubble-blur, none); -webkit-backdrop-filter: var(--bubble-blur, none);
+    transition: all 0.3s;
   }
   .message.ai { 
     background: var(--bubble-ai-bg, #ffffff); 
-    color: var(--bubble-ai-text, #333);
+    color: var(--bubble-ai-text, #333); 
     border-top-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); 
   }
   .message.user { 
@@ -46,17 +51,20 @@
     border-top-right-radius: 4px; box-shadow: 0 1px 4px rgba(0,122,255,0.2); 
   }
   
-  /* 气泡小尖角 */
-  .message.ai::before { content: ''; position: absolute; top: 0; left: -8px; border: 8px solid transparent; border-top-color: var(--bubble-ai-bg, #fff); border-right-color: var(--bubble-ai-bg, #fff); }
-  .message.user::before { content: ''; position: absolute; top: 0; right: -8px; border: 8px solid transparent; border-top-color: var(--bubble-user-bg, #007aff); border-left-color: var(--bubble-user-bg, #007aff); }
+  .message.ai::before { content: ''; position: absolute; top: 0; left: -8px; border: 8px solid transparent; border-top-color: var(--bubble-ai-tri, #fff); border-right-color: var(--bubble-ai-tri, #fff); }
+  .message.user::before { content: ''; position: absolute; top: 0; right: -8px; border: 8px solid transparent; border-top-color: var(--bubble-user-tri, #007aff); border-left-color: var(--bubble-user-tri, #007aff); }
 
-  /* 底部输入 (毛玻璃) */
-  .chat-input-area { display: flex; padding: 12px 15px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px); box-shadow: 0 -1px 8px rgba(0,0,0,0.05); }
+  .chat-input-area { 
+    display: flex; padding: 12px 15px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); 
+    background: var(--panel-bg, rgba(255, 255, 255, 0.7)); 
+    backdrop-filter: var(--material-blur, blur(15px)); -webkit-backdrop-filter: var(--material-blur, blur(15px)); 
+    border-top: var(--material-border, none);
+    box-shadow: 0 -1px 8px rgba(0,0,0,0.05); transition: all 0.3s;
+  }
   #message-input { flex: 1; padding: 12px 16px; border: 1px solid #e5e5ea; border-radius: 22px; font-size: 15px; outline: none; background: rgba(242, 242, 247, 0.8); }
   #send-btn { margin-left: 10px; padding: 0 20px; background: #007aff; color: #fff; border: none; border-radius: 22px; font-size: 15px; font-weight: 500; cursor: pointer; }
   #send-btn:disabled { background: #ccc; }
 
-  /* 弹窗设置 */
   .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); }
   .modal.active { display: flex; }
   .modal-content { background: #fff; padding: 20px; border-radius: 16px; width: 95%; max-width: 450px; display: flex; flex-direction: column; gap: 12px; max-height: 90vh; overflow-y: auto; }
@@ -92,20 +100,12 @@
     <button id="send-btn">发送</button>
   </div>
 
-  <!-- 设置面板 -->
+  <!-- 角色设置弹窗 -->
   <div class="modal" id="settings-modal">
     <div class="modal-content">
       <h3>📇 角色卡设置</h3>
-      
-      <div class="form-group">
-        <label>底层 ID (继承自桌面)</label>
-        <input type="text" id="card-name" disabled style="background:#f0f0f0; color:#999;">
-      </div>
-      <div class="form-group">
-        <label>显示昵称 (备注，优先展示)</label>
-        <input type="text" id="card-nickname" placeholder="如：夏小猫">
-      </div>
-      
+      <div class="form-group"><label>底层 ID</label><input type="text" id="card-name" disabled style="background:#f0f0f0; color:#999;"></div>
+      <div class="form-group"><label>显示昵称 (备注)</label><input type="text" id="card-nickname" placeholder="如：夏小猫"></div>
       <div class="form-group"><label>性别 / 年龄</label><input type="text" id="card-gender" placeholder="选填"></div>
       <div class="form-group"><label>外貌特征</label><input type="text" id="card-appearance" placeholder="选填"></div>
       <div class="form-group"><label>性格标签</label><input type="text" id="card-personality" placeholder="如：傲娇, 年上, 猫系"></div>
@@ -116,7 +116,7 @@
 
       <label class="checkbox-row">
         <input type="checkbox" id="use-custom-api" onchange="toggleCustomApi()">
-        启用该角色专属 API
+        启用专属 API
       </label>
 
       <div id="custom-api-area" class="custom-api-area hidden">
@@ -129,18 +129,16 @@
         <button class="btn-cancel" onclick="closeSettings()">取消</button>
         <button class="btn-save" onclick="saveSettings()">保存设置</button>
       </div>
-      <button class="btn-danger" onclick="clearChat()">🗑️ 清空当前聊天记录并重置</button>
+      <button class="btn-danger" onclick="clearChat()">🗑️ 清空记录并重置</button>
     </div>
   </div>
 
 <script>
-  // 1. 读取基本参数与全局配置
   const characterName = new URLSearchParams(window.location.search).get('name') || '默认角色';
   document.getElementById('card-name').value = characterName;
 
   let globalApiConfig = JSON.parse(localStorage.getItem('globalApiConfig')) || { provider: 'deepseek', key: '', model: 'deepseek-chat' };
   let globalUser = JSON.parse(localStorage.getItem('globalUserConfig')) || { nickname: '我', avatar: '' };
-  
   const defaultUserAvatar = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMDA3YWZmIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuM2VtIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0Ij5NZTwvdGV4dD48L3N2Zz4=';
   const defaultAiAvatar = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuM2VtIiBmaWxsPSIjODg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIj5BSTwvdGV4dD48L3N2Zz4=';
 
@@ -148,37 +146,70 @@
   let charConfig = JSON.parse(localStorage.getItem('charConfig_' + characterName)) || { ...defaultCardData };
   let chatHistory = JSON.parse(localStorage.getItem('chatHistory_' + characterName)) || [];
 
-  // 2. 动态应用主题和壁纸
+  // 动态应用主题、气泡和材质
   let themeConfig = JSON.parse(localStorage.getItem('myThemeConfig')) || {};
   const root = document.documentElement;
+
   if (themeConfig.userBubbleColor) {
-    root.style.setProperty('--bubble-user-bg', themeConfig.userBubbleColor);
-    root.style.setProperty('--bubble-user-text', getContrastColor(themeConfig.userBubbleColor));
-    root.style.setProperty('--bubble-ai-bg', themeConfig.aiBubbleColor);
-    root.style.setProperty('--bubble-ai-text', getContrastColor(themeConfig.aiBubbleColor));
+    // 颜色变量
     root.style.setProperty('--bubble-radius', themeConfig.bubbleRadius + 'px');
     root.style.setProperty('--theme-font', themeConfig.fontFamily);
-  }
-  
-  const bg = localStorage.getItem('globalBgImage');
-  if(bg) document.body.style.background = `url(${bg}) center/cover no-repeat fixed`;
+    root.style.setProperty('--bubble-user-text', getContrastColor(themeConfig.userBubbleColor));
+    root.style.setProperty('--bubble-ai-text', getContrastColor(themeConfig.aiBubbleColor));
 
+    // 根据材质设置透明度、模糊和尖角颜色
+    if (themeConfig.material === 'frosted') {
+      root.style.setProperty('--bubble-user-bg', `rgba(${hexToRgb(themeConfig.userBubbleColor)}, 0.75)`);
+      root.style.setProperty('--bubble-ai-bg', `rgba(${hexToRgb(themeConfig.aiBubbleColor)}, 0.75)`);
+      root.style.setProperty('--bubble-user-tri', `rgba(${hexToRgb(themeConfig.userBubbleColor)}, 0.75)`);
+      root.style.setProperty('--bubble-ai-tri', `rgba(${hexToRgb(themeConfig.aiBubbleColor)}, 0.75)`);
+      root.style.setProperty('--bubble-blur', 'blur(15px)');
+      root.style.setProperty('--bubble-border', '1px solid rgba(255,255,255,0.3)');
+      root.style.setProperty('--panel-bg', 'rgba(255,255,255,0.6)');
+      root.style.setProperty('--material-blur', 'blur(15px)');
+      root.style.setProperty('--material-border', '1px solid rgba(255,255,255,0.3)');
+    } else if (themeConfig.material === 'glass') {
+      root.style.setProperty('--bubble-user-bg', `rgba(${hexToRgb(themeConfig.userBubbleColor)}, 0.35)`);
+      root.style.setProperty('--bubble-ai-bg', `rgba(${hexToRgb(themeConfig.aiBubbleColor)}, 0.35)`);
+      root.style.setProperty('--bubble-user-tri', `rgba(${hexToRgb(themeConfig.userBubbleColor)}, 0.35)`);
+      root.style.setProperty('--bubble-ai-tri', `rgba(${hexToRgb(themeConfig.aiBubbleColor)}, 0.35)`);
+      root.style.setProperty('--bubble-blur', 'blur(20px) saturate(180%)');
+      root.style.setProperty('--bubble-border', '1px solid rgba(255,255,255,0.6)');
+      root.style.setProperty('--panel-bg', 'rgba(255,255,255,0.2)');
+      root.style.setProperty('--material-blur', 'blur(20px) saturate(180%)');
+      root.style.setProperty('--material-border', '1px solid rgba(255,255,255,0.6)');
+    } else {
+      // Solid
+      root.style.setProperty('--bubble-user-bg', `rgb(${hexToRgb(themeConfig.userBubbleColor)})`);
+      root.style.setProperty('--bubble-ai-bg', `rgb(${hexToRgb(themeConfig.aiBubbleColor)})`);
+      root.style.setProperty('--bubble-user-tri', `rgb(${hexToRgb(themeConfig.userBubbleColor)})`);
+      root.style.setProperty('--bubble-ai-tri', `rgb(${hexToRgb(themeConfig.aiBubbleColor)})`);
+      root.style.setProperty('--bubble-blur', 'none');
+      root.style.setProperty('--bubble-border', 'none');
+      root.style.setProperty('--panel-bg', 'rgba(255,255,255,0.95)');
+      root.style.setProperty('--material-blur', 'none');
+      root.style.setProperty('--material-border', 'none');
+    }
+  }
+
+  function hexToRgb(hex) {
+    hex = hex.replace("#", "");
+    var r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
+    return `${r},${g},${b}`;
+  }
   function getContrastColor(hexcolor) {
     if(!hexcolor) return '#333';
     hexcolor = hexcolor.replace("#", "");
-    var r = parseInt(hexcolor.substr(0, 2), 16);
-    var g = parseInt(hexcolor.substr(2, 2), 16);
-    var b = parseInt(hexcolor.substr(4, 2), 16);
-    var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    return (yiq >= 128) ? '#333333' : '#ffffff';
+    var r = parseInt(hexcolor.substr(0, 2), 16), g = parseInt(hexcolor.substr(2, 2), 16), b = parseInt(hexcolor.substr(4, 2), 16);
+    return (((r * 299) + (g * 587) + (b * 114)) / 1000 >= 128) ? '#333333' : '#ffffff';
   }
+  
+  const chatBg = localStorage.getItem('bgImageChat') || localStorage.getItem('bgImageMain');
+  if(chatBg) document.body.style.background = `url(${chatBg}) center/cover no-repeat fixed`;
 
-  // 3. 初始化与 UI 交互
+  // ====== 业务逻辑 ======
   updateHeaderTitle();
-  function updateHeaderTitle() {
-    document.getElementById('character-name').textContent = charConfig.nickname || characterName;
-  }
-
+  function updateHeaderTitle() { document.getElementById('character-name').textContent = charConfig.nickname || characterName; }
   function openSettings() {
     document.getElementById('card-nickname').value = charConfig.nickname || '';
     document.getElementById('card-gender').value = charConfig.gender || '';
@@ -188,19 +219,14 @@
     document.getElementById('card-speaking-style').value = charConfig.speakingStyle || '';
     document.getElementById('card-first-message').value = charConfig.firstMessage || '';
     document.getElementById('card-system-prompt').value = charConfig.systemPrompt || '';
-
     document.getElementById('use-custom-api').checked = charConfig.useCustomApi;
     document.getElementById('api-provider').value = charConfig.provider;
     document.getElementById('api-key').value = charConfig.key;
     document.getElementById('api-model').value = charConfig.model;
-    
-    toggleCustomApi();
-    document.getElementById('settings-modal').classList.add('active');
+    toggleCustomApi(); document.getElementById('settings-modal').classList.add('active');
   }
-
   function closeSettings() { document.getElementById('settings-modal').classList.remove('active'); }
   function toggleCustomApi() { document.getElementById('custom-api-area').classList.toggle('hidden', !document.getElementById('use-custom-api').checked); }
-
   function buildSystemPrompt() {
     let prompt = `你正在扮演一个名为"${characterName}"的角色。`;
     if(charConfig.nickname) prompt += `用户给你起的昵称是"${charConfig.nickname}"。`;
@@ -214,7 +240,6 @@
     prompt += `\n用自然、符合设定的语气与用户对话。`;
     return prompt;
   }
-
   function saveSettings() {
     charConfig.nickname = document.getElementById('card-nickname').value.trim();
     charConfig.gender = document.getElementById('card-gender').value.trim();
@@ -224,36 +249,24 @@
     charConfig.speakingStyle = document.getElementById('card-speaking-style').value.trim();
     charConfig.firstMessage = document.getElementById('card-first-message').value.trim();
     charConfig.systemPrompt = document.getElementById('card-system-prompt').value.trim();
-
     charConfig.useCustomApi = document.getElementById('use-custom-api').checked;
     charConfig.provider = document.getElementById('api-provider').value;
     charConfig.key = document.getElementById('api-key').value.trim();
     charConfig.model = document.getElementById('api-model').value.trim();
-    
     localStorage.setItem('charConfig_' + characterName, JSON.stringify(charConfig));
-    closeSettings();
-    updateHeaderTitle(); 
+    closeSettings(); updateHeaderTitle(); 
     if (chatHistory.length === 0) renderMessages();
     alert('角色卡已保存！');
   }
-
   function clearChat() {
-    if (confirm('确定要清空所有聊天记录吗？')) {
-      chatHistory = []; localStorage.removeItem('chatHistory_' + characterName); renderMessages(); closeSettings();
-    }
+    if (confirm('确定要清空所有聊天记录吗？')) { chatHistory = []; localStorage.removeItem('chatHistory_' + characterName); renderMessages(); closeSettings(); }
   }
 
-  // 4. 渲染消息 (带头像)
   function renderMessages() {
     const messagesContainer = document.getElementById('message-container');
     messagesContainer.innerHTML = '';
-    
-    if (chatHistory.length === 0 && charConfig.firstMessage) {
-      addMessageRow('ai', charConfig.firstMessage);
-    }
-    chatHistory.forEach(msg => {
-      addMessageRow(msg.role === 'assistant' ? 'ai' : 'user', msg.content);
-    });
+    if (chatHistory.length === 0 && charConfig.firstMessage) addMessageRow('ai', charConfig.firstMessage);
+    chatHistory.forEach(msg => addMessageRow(msg.role === 'assistant' ? 'ai' : 'user', msg.content));
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
@@ -261,25 +274,18 @@
     const container = document.getElementById('message-container');
     const row = document.createElement('div');
     row.className = `message-row ${role}`;
-
     let avatarSrc = role === 'ai' ? defaultAiAvatar : (globalUser.avatar || defaultUserAvatar);
-
-    row.innerHTML = `
-      <img src="${avatarSrc}" class="msg-avatar">
-      <div class="message ${role}">${text}</div>
-    `;
+    row.innerHTML = `<img src="${avatarSrc}" class="msg-avatar"><div class="message ${role}">${text}</div>`;
     container.appendChild(row);
   }
 
-  // 5. 发送消息与打字机效果
   async function sendMessage() {
     const inputField = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-btn');
     const text = inputField.value.trim();
     if (!text) return;
-
     const activeConfig = charConfig.useCustomApi ? charConfig : globalApiConfig;
-    if (!activeConfig.key) { alert('请先在主页设置 API Key！'); return; }
+    if (!activeConfig.key) { alert('请先设置 API Key！'); return; }
 
     chatHistory.push({ role: 'user', content: text });
     inputField.value = '';
@@ -289,42 +295,29 @@
     const loadingRow = document.createElement('div');
     loadingRow.className = 'message-row ai';
     loadingRow.innerHTML = `<img src="${defaultAiAvatar}" class="msg-avatar"><div class="message ai" style="color:#888; font-style:italic;">正在输入...</div>`;
-    container.appendChild(loadingRow);
-    container.scrollTop = container.scrollHeight;
+    container.appendChild(loadingRow); container.scrollTop = container.scrollHeight;
     sendBtn.disabled = true;
 
     let url = activeConfig.provider === 'deepseek' ? 'https://api.deepseek.com/chat/completions' : 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
     const messagesToSend = [{ role: 'system', content: buildSystemPrompt() }];
-    if (chatHistory.length === 1 && charConfig.firstMessage) {
-      messagesToSend.push({ role: 'assistant', content: charConfig.firstMessage });
-    }
+    if (chatHistory.length === 1 && charConfig.firstMessage) messagesToSend.push({ role: 'assistant', content: charConfig.firstMessage });
     messagesToSend.push(...chatHistory);
 
-    const body = {
-      model: activeConfig.model || (activeConfig.provider === 'deepseek' ? 'deepseek-chat' : 'glm-4-flash'),
-      messages: messagesToSend
-    };
+    const body = { model: activeConfig.model || (activeConfig.provider === 'deepseek' ? 'deepseek-chat' : 'glm-4-flash'), messages: messagesToSend };
 
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${activeConfig.key}` },
-        body: JSON.stringify(body)
-      });
+      const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${activeConfig.key}` }, body: JSON.stringify(body) });
       if (!response.ok) throw new Error('API 请求失败');
       const data = await response.json();
-      
       loadingRow.remove();
       const aiText = data.choices[0].message.content;
       
-      // 保存历史记录
       chatHistory.push({ role: 'assistant', content: aiText });
       localStorage.setItem('chatHistory_' + characterName, JSON.stringify(chatHistory));
       
-      // —— 打字机效果开始 ——
       const prevHistory = chatHistory.slice(0, -1);
       container.innerHTML = '';
-      prevHistory.forEach(msg => { addMessageRow(msg.role === 'assistant' ? 'ai' : 'user', msg.content); });
+      prevHistory.forEach(msg => addMessageRow(msg.role === 'assistant' ? 'ai' : 'user', msg.content));
 
       const typewriterRow = document.createElement('div');
       typewriterRow.className = `message-row ai`;
@@ -334,21 +327,11 @@
       const textContainer = document.getElementById('typewriter-text');
       let i = 0;
       const timer = setInterval(() => {
-        if (i < aiText.length) {
-          textContainer.textContent += aiText.charAt(i);
-          i++;
-          container.scrollTop = container.scrollHeight;
-        } else {
-          clearInterval(timer);
-        }
-      }, 50); // 这里调整速度：50ms/字
-      // —— 打字机效果结束 ——
-
+        if (i < aiText.length) { textContainer.textContent += aiText.charAt(i); i++; container.scrollTop = container.scrollHeight; } else { clearInterval(timer); }
+      }, 50);
     } catch (error) {
       loadingRow.innerHTML = `<img src="${defaultAiAvatar}" class="msg-avatar"><div class="message ai" style="color:red;">连接失败，请检查跨域或 Key。</div>`;
-    } finally {
-      sendBtn.disabled = false;
-    }
+    } finally { sendBtn.disabled = false; }
   }
 
   document.getElementById('send-btn').addEventListener('click', sendMessage);
